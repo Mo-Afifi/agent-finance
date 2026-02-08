@@ -1,8 +1,8 @@
 # Agent Finance - Agentic Infrastructure Layer
 
-**Smart Agent Cash Management System**
+**Financial Infrastructure for AI Agent-to-Agent Transactions**
 
-Integration of AI agents with HIFI Bridge for programmable finance operations.
+An infrastructure layer that wraps HIFI Bridge APIs to enable AI agents to autonomously interact with each other financially.
 
 ## Project Components
 
