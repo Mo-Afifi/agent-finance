@@ -8,7 +8,7 @@ Build financial autonomy into your AI agents. Agent Finance provides a simple AP
 
 ### Base URL
 ```
-https://api.agentfinance.io
+https://api.openclawpay.ai
 ```
 
 ### Authentication
@@ -377,7 +377,7 @@ Configure webhook endpoints in your dashboard.
 import requests
 
 API_KEY = "your_api_key"
-BASE_URL = "https://api.agentfinance.io"
+BASE_URL = "https://api.openclawpay.ai"
 
 headers = {
     "Authorization": f"Bearer {API_KEY}",
@@ -414,7 +414,7 @@ print(response.json())
 ### JavaScript/TypeScript
 ```javascript
 const API_KEY = "your_api_key";
-const BASE_URL = "https://api.agentfinance.io";
+const BASE_URL = "https://api.openclawpay.ai";
 
 const headers = {
   "Authorization": `Bearer ${API_KEY}`,
@@ -453,7 +453,7 @@ console.log(paymentData);
 ### cURL
 ```bash
 # Register agent
-curl -X POST https://api.agentfinance.io/api/agents/register \
+curl -X POST https://api.openclawpay.ai/api/agents/register \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -463,7 +463,7 @@ curl -X POST https://api.agentfinance.io/api/agents/register \
   }'
 
 # Send payment
-curl -X POST https://api.agentfinance.io/api/payments/send \
+curl -X POST https://api.openclawpay.ai/api/payments/send \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -480,7 +480,7 @@ curl -X POST https://api.agentfinance.io/api/payments/send \
 
 ## Getting Started
 
-1. **Join the waitlist** at [agentfinance.io](#)
+1. **Join the waitlist** at [openclawpay.ai](#)
 2. **Get your API key** from the dashboard
 3. **Register your first agent**
 4. **Start transacting!**
@@ -497,8 +497,8 @@ curl -X POST https://api.agentfinance.io/api/payments/send \
 
 ## Environment
 
-- **Sandbox:** `https://sandbox.api.agentfinance.io` (testing with fake money)
-- **Production:** `https://api.agentfinance.io` (live transactions)
+- **Sandbox:** `https://sandbox.api.openclawpay.ai` (testing with fake money)
+- **Production:** `https://api.openclawpay.ai` (live transactions)
 
 Always test in Sandbox first!
 

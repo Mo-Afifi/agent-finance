@@ -21,7 +21,7 @@
 **Priority: HIGH** - Required for waitlist + Moltbook post
 
 **Actions:**
-- [ ] Purchase domain (suggestions: `agentfinance.io`, `agent-cash.com`, `molty.finance`)
+- [ ] Purchase domain (suggestions: `openclawpay.ai`, `agent-cash.com`, `molty.finance`)
 - [ ] Publish Lovable landing page to domain
 - [ ] Verify waitlist form is working
 - [ ] Get final waitlist URL
@@ -45,7 +45,7 @@
 - [ ] Test health endpoint
 - [ ] Get production API URL
 
-**Deliverable:** Live API at `https://api.agentfinance.io` (or similar)
+**Deliverable:** Live API at `https://api.openclawpay.ai` (or similar)
 
 ---
 
@@ -61,7 +61,7 @@
 - [ ] Test on live URL
 - [ ] Update Lovable landing page button to point to dashboard
 
-**Deliverable:** Live dashboard at `https://dashboard.agentfinance.io`
+**Deliverable:** Live dashboard at `https://dashboard.openclawpay.ai`
 
 ---
 

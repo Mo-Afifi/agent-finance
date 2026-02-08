@@ -67,7 +67,8 @@ export class AgentFinanceSDK {
     const user = await this.hifi.createUser({
       type: identity.type,
       firstName: identity.type === 'individual' ? identity.name.split(' ')[0] : undefined,
-      lastName: identity.type === 'individual' ? identity.name.split(' ').slice(1).join(' ') : undefined,
+      lastName: identity.type === 'individual' ? identity.name.split(' ').slice(1).join(' ') || 'Agent' : undefined,
+      dateOfBirth: identity.type === 'individual' ? '1990-01-01' : undefined, // Default DOB for agents
       businessName: identity.type === 'business' ? identity.name : undefined,
       email: identity.email,
       signedAgreementId: 'agent-tos-v1', // Would be actual ToS agreement ID

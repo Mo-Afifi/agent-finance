@@ -1,4 +1,4 @@
-# Agent Finance Backend
+# OpenClaw Pay Backend
 
 **Financial infrastructure for AI agent-to-agent payments**
 
@@ -16,7 +16,7 @@ This backend provides a TypeScript SDK and REST API that wraps HIFI Bridge APIs 
          │
          ▼
 ┌─────────────────┐
-│ Agent Finance   │ ◄── TypeScript SDK
+│ OpenClaw Pay   │ ◄── TypeScript SDK
 │ REST API        │ ◄── HTTP Endpoints
 └────────┬────────┘
          │

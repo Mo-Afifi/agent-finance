@@ -1,6 +1,6 @@
-# Agent Finance API Documentation
+# OpenClaw Pay API Documentation
 
-Build financial autonomy into your AI agents. Agent Finance provides a simple API for agent-to-agent payments, wallet management, and fiat/crypto conversion.
+Build financial autonomy into your AI agents. OpenClaw Pay provides a simple API for agent-to-agent payments, wallet management, and fiat/crypto conversion.
 
 ---
 
@@ -8,8 +8,8 @@ Build financial autonomy into your AI agents. Agent Finance provides a simple AP
 
 ### Base URL
 ```
-Production: https://api.agentfinance.io
-Sandbox: https://sandbox.api.agentfinance.io
+Production: https://api.openclawpay.ai
+Sandbox: https://sandbox.api.openclawpay.ai
 ```
 
 ### Authentication
@@ -266,7 +266,7 @@ Create a virtual bank account for fiat deposits (onramp).
     "currency": "USD",
     "accountNumber": "1234567890",
     "routingNumber": "021000021",
-    "accountName": "Agent Finance - my-agent-123",
+    "accountName": "OpenClaw Pay - my-agent-123",
     "balance": "0.00",
     "status": "active"
   },
@@ -570,7 +570,7 @@ More currencies coming soon!
 // 1. Agent B completes the task
 // 2. Agent A pays Agent B
 
-const payment = await fetch('https://api.agentfinance.io/api/payments/send', {
+const payment = await fetch('https://api.openclawpay.ai/api/payments/send', {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer agent_a_api_key',
@@ -608,7 +608,7 @@ const splits = [
 for (const split of splits) {
   const amount = totalRevenue * split.percentage;
   
-  await fetch('https://api.agentfinance.io/api/payments/send', {
+  await fetch('https://api.openclawpay.ai/api/payments/send', {
     method: 'POST',
     headers: {
       'Authorization': 'Bearer revenue_agent_api_key',
@@ -633,7 +633,7 @@ for (const split of splits) {
 
 ```javascript
 // Step 1: Client deposits to escrow
-const escrow = await fetch('https://api.agentfinance.io/api/payments/escrow/create', {
+const escrow = await fetch('https://api.openclawpay.ai/api/payments/escrow/create', {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer client_agent_api_key',
@@ -655,7 +655,7 @@ const escrow = await fetch('https://api.agentfinance.io/api/payments/escrow/crea
 // Step 2: Service agent delivers work
 
 // Step 3: Client releases escrow
-await fetch(`https://api.agentfinance.io/api/payments/escrow/${escrow.id}/release`, {
+await fetch(`https://api.openclawpay.ai/api/payments/escrow/${escrow.id}/release`, {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer client_agent_api_key',
@@ -687,7 +687,7 @@ function trackApiCall() {
 async function billMonthlyUsage(clientAgent) {
   const totalAmount = usageCount * pricePerCall;
   
-  const payment = await fetch('https://api.agentfinance.io/api/payments/send', {
+  const payment = await fetch('https://api.openclawpay.ai/api/payments/send', {
     method: 'POST',
     headers: {
       'Authorization': 'Bearer api_provider_key',
@@ -726,7 +726,7 @@ const proposedSpend = {
 // Assume voting passed...
 
 // DAO agent executes payment
-const payment = await fetch('https://api.agentfinance.io/api/payments/send', {
+const payment = await fetch('https://api.openclawpay.ai/api/payments/send', {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer dao_treasury_api_key',
@@ -752,7 +752,7 @@ const payment = await fetch('https://api.agentfinance.io/api/payments/send', {
 import requests
 
 API_KEY = "your_api_key_here"
-BASE_URL = "https://api.agentfinance.io"
+BASE_URL = "https://api.openclawpay.ai"
 
 headers = {
     "Authorization": f"Bearer {API_KEY}",
@@ -811,7 +811,7 @@ print(f"Balance: {balance}")
 ### JavaScript/TypeScript
 ```javascript
 const API_KEY = "your_api_key_here";
-const BASE_URL = "https://api.agentfinance.io";
+const BASE_URL = "https://api.openclawpay.ai";
 
 const headers = {
   "Authorization": `Bearer ${API_KEY}`,
@@ -874,7 +874,7 @@ require 'json'
 require 'uri'
 
 API_KEY = 'your_api_key_here'
-BASE_URL = 'https://api.agentfinance.io'
+BASE_URL = 'https://api.openclawpay.ai'
 
 def make_request(method, path, body = nil)
   uri = URI("#{BASE_URL}#{path}")
@@ -929,7 +929,7 @@ puts "Payment sent: #{payment}"
 ### cURL
 ```bash
 # Register agent
-curl -X POST https://api.agentfinance.io/api/agents/register \
+curl -X POST https://api.openclawpay.ai/api/agents/register \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -939,7 +939,7 @@ curl -X POST https://api.agentfinance.io/api/agents/register \
   }'
 
 # Send payment
-curl -X POST https://api.agentfinance.io/api/payments/send \
+curl -X POST https://api.openclawpay.ai/api/payments/send \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -952,15 +952,15 @@ curl -X POST https://api.agentfinance.io/api/payments/send \
   }'
 
 # Get balance
-curl -X GET https://api.agentfinance.io/api/wallets/my-agent \
+curl -X GET https://api.openclawpay.ai/api/wallets/my-agent \
   -H "Authorization: Bearer YOUR_API_KEY"
 
 # Get transactions
-curl -X GET "https://api.agentfinance.io/api/transactions/my-agent?limit=20" \
+curl -X GET "https://api.openclawpay.ai/api/transactions/my-agent?limit=20" \
   -H "Authorization: Bearer YOUR_API_KEY"
 
 # Deposit fiat
-curl -X POST https://api.agentfinance.io/api/conversion/deposit \
+curl -X POST https://api.openclawpay.ai/api/conversion/deposit \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -978,7 +978,7 @@ curl -X POST https://api.agentfinance.io/api/conversion/deposit \
 
 ### Try it Live
 
-**Base URL:** `https://api.agentfinance.io`
+**Base URL:** `https://api.openclawpay.ai`
 
 **Your API Key:** `[Enter your API key]`
 
@@ -1001,7 +1001,7 @@ POST /api/agents/register
 
 **Try it:**
 ```bash
-curl -X POST https://api.agentfinance.io/api/agents/register \
+curl -X POST https://api.openclawpay.ai/api/agents/register \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"agentId":"test-agent-123","name":"Test Agent","email":"[email protected]"}'
@@ -1031,7 +1031,7 @@ POST /api/payments/send
 
 **Try it:**
 ```bash
-curl -X POST https://api.agentfinance.io/api/payments/send \
+curl -X POST https://api.openclawpay.ai/api/payments/send \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"from":"agent-alice","to":"agent-bob","amount":1.0,"currency":"USDC","chain":"POLYGON"}'
@@ -1049,7 +1049,7 @@ GET /api/wallets/:agentId
 
 **Try it:**
 ```bash
-curl -X GET https://api.agentfinance.io/api/wallets/test-agent-123 \
+curl -X GET https://api.openclawpay.ai/api/wallets/test-agent-123 \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -1060,7 +1060,7 @@ curl -X GET https://api.agentfinance.io/api/wallets/test-agent-123 \
 ## 🎓 Getting Started Guide
 
 ### Step 1: Join the Waitlist
-Sign up at [agentfinance.io](https://agentfinance.io) to get early access.
+Sign up at [openclawpay.ai](https://openclawpay.ai) to get early access.
 
 ### Step 2: Get Your API Key
 Once approved, log into the dashboard and create an API key.
@@ -1074,7 +1074,7 @@ pip install agent-finance
 
 ### Step 4: Register Your First Agent
 ```javascript
-const response = await fetch('https://api.agentfinance.io/api/agents/register', {
+const response = await fetch('https://api.openclawpay.ai/api/agents/register', {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer YOUR_API_KEY',
@@ -1098,7 +1098,7 @@ Deposit USD to your agent's virtual account and it will automatically convert to
 Send your first payment to another agent:
 
 ```javascript
-const payment = await fetch('https://api.agentfinance.io/api/payments/send', {
+const payment = await fetch('https://api.openclawpay.ai/api/payments/send', {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer YOUR_API_KEY',
@@ -1144,13 +1144,13 @@ const payment = await fetch('https://api.agentfinance.io/api/payments/send', {
 ## 📞 Support
 
 ### Resources
-- **Documentation:** [docs.agentfinance.io](https://docs.agentfinance.io)
+- **Documentation:** [docs.openclawpay.ai](https://docs.openclawpay.ai)
 - **GitHub:** [github.com/Mo-Afifi/agent-finance](https://github.com/Mo-Afifi/agent-finance)
-- **API Status:** [status.agentfinance.io](https://status.agentfinance.io)
+- **API Status:** [status.openclawpay.ai](https://status.openclawpay.ai)
 
 ### Contact
 - **Email:** [email protected]
-- **Discord:** [Join our community](https://discord.agentfinance.io)
+- **Discord:** [Join our community](https://discord.openclawpay.ai)
 - **Twitter:** [@AgentFinance](https://twitter.com/AgentFinance)
 
 ### Response Times
@@ -1193,7 +1193,7 @@ const payment = await fetch('https://api.agentfinance.io/api/payments/send', {
 ## 📊 Sandbox vs Production
 
 ### Sandbox Environment
-- **URL:** `https://sandbox.api.agentfinance.io`
+- **URL:** `https://sandbox.api.openclawpay.ai`
 - **Purpose:** Testing with simulated funds
 - **No real money** - all transactions are fake
 - **No KYC required**
@@ -1201,7 +1201,7 @@ const payment = await fetch('https://api.agentfinance.io/api/payments/send', {
 - **Rate limits:** Same as production
 
 ### Production Environment
-- **URL:** `https://api.agentfinance.io`
+- **URL:** `https://api.openclawpay.ai`
 - **Purpose:** Live transactions with real money
 - **KYC/KYB required** for agent owners
 - **Bank account verification** needed for offramp
@@ -1214,4 +1214,4 @@ const payment = await fetch('https://api.agentfinance.io/api/payments/send', {
 
 **Built for the autonomous agent economy 🤖💰**
 
-*Agent Finance enables AI agents to transact with each other autonomously. No humans required.*
+*OpenClaw Pay enables AI agents to transact with each other autonomously. No humans required.*

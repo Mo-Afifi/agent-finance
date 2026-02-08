@@ -1,13 +1,19 @@
-# Agent Finance Dashboard
+# OpenClaw Pay Dashboard
 
-Management interface for the Agent Finance infrastructure layer.
+Management interface for the OpenClaw Pay infrastructure layer.
 
 > **Note**: The landing page is hosted separately on [Lovable](https://smart-agent-cash.lovable.app). This app is the **Dashboard only**.
 
 ## Features
 
+### Authentication
+- **Google OAuth 2.0**: Secure sign-in with Google accounts
+- **Protected Routes**: Dashboard only accessible when authenticated
+- **Session Persistence**: User sessions stored locally
+- **User Profile**: Display logged-in user info in header
+
 ### Dashboard
-- **Agent Management**: View and register AI agents
+- **Agent Management**: View and register AI agents (filtered by owner)
 - **Balance Monitoring**: Track virtual accounts and wallet balances
 - **Transaction History**: Complete audit trail of agent-to-agent transfers
 - **Real-time Activity**: Live feed of all financial events
@@ -40,8 +46,50 @@ npm install
 # Copy environment template
 cp .env.example .env
 
-# Update .env with your backend API URL (default: http://localhost:3000)
+# Configure environment variables in .env:
+# 1. VITE_API_URL - Backend API endpoint
+# 2. VITE_GOOGLE_CLIENT_ID - Google OAuth Client ID (see Google OAuth Setup below)
 ```
+
+### Google OAuth Setup
+
+To enable authentication, you need to create Google OAuth credentials:
+
+1. **Go to Google Cloud Console**
+   - Visit https://console.cloud.google.com/apis/credentials
+   - Create a new project or select an existing one
+
+2. **Enable Google+ API**
+   - Go to "APIs & Services" > "Library"
+   - Search for "Google+ API" and enable it
+
+3. **Create OAuth 2.0 Client ID**
+   - Go to "APIs & Services" > "Credentials"
+   - Click "Create Credentials" > "OAuth client ID"
+   - Choose "Web application"
+   - Add authorized JavaScript origins:
+     - `http://localhost:5173` (for development)
+     - Your production domain (e.g., `https://pay.yourdomain.com`)
+   - Add authorized redirect URIs:
+     - `http://localhost:5173` (for development)
+     - Your production domain
+
+4. **Copy the Client ID**
+   - Copy the generated Client ID
+   - Add it to your `.env` file:
+     ```env
+     VITE_GOOGLE_CLIENT_ID=your_client_id_here.apps.googleusercontent.com
+     ```
+
+5. **Restart the dev server**
+   ```bash
+   npm run dev
+   ```
+
+**Important Notes:**
+- Never commit your `.env` file to git (it's already in `.gitignore`)
+- For production, set `VITE_GOOGLE_CLIENT_ID` as an environment variable in your deployment platform
+- Make sure to add your production domain to authorized origins in Google Cloud Console before deploying
 
 ### Development
 
@@ -70,9 +118,11 @@ Create a `.env` file with:
 
 ```env
 VITE_API_URL=http://localhost:3000
+VITE_GOOGLE_CLIENT_ID=your_google_client_id_here.apps.googleusercontent.com
 ```
 
 - **VITE_API_URL**: Backend API endpoint (default: http://localhost:3000)
+- **VITE_GOOGLE_CLIENT_ID**: Google OAuth 2.0 Client ID (required for authentication)
 
 ## Project Structure
 
@@ -86,10 +136,14 @@ frontend/
 │   │   ├── TransactionHistory.tsx
 │   │   ├── ActivityFeed.tsx   # Real-time activity stream
 │   │   ├── CreateAgentModal.tsx
-│   │   └── StatsCard.tsx      # Reusable stats display
+│   │   ├── StatsCard.tsx      # Reusable stats display
+│   │   └── ProtectedRoute.tsx # Auth guard for protected routes
+│   ├── contexts/
+│   │   └── AuthContext.tsx    # Authentication state management
 │   ├── pages/
-│   │   └── Dashboard.tsx      # Main dashboard (default route)
-│   ├── App.tsx                # Router configuration
+│   │   ├── Dashboard.tsx      # Main dashboard (protected)
+│   │   └── Login.tsx          # Google OAuth login page
+│   ├── App.tsx                # Router configuration + AuthProvider
 │   ├── main.tsx               # Entry point
 │   └── index.css              # Global styles + Tailwind
 ├── public/

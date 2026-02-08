@@ -1,8 +1,10 @@
-# Agent Finance - Agentic Infrastructure Layer
+# OpenClaw Pay - Agentic Infrastructure Layer
 
 **Financial Infrastructure for AI Agent-to-Agent Transactions**
 
 An infrastructure layer that wraps HIFI Bridge APIs to enable AI agents to autonomously interact with each other financially.
+
+**Live at:** https://openclawpay.ai
 
 ## Project Components
 

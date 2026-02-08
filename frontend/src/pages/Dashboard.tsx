@@ -11,7 +11,9 @@ import {
   CheckCircle,
   Clock,
   XCircle,
-  ExternalLink
+  ExternalLink,
+  LogOut,
+  User
 } from 'lucide-react';
 import { agentFinanceAPI, Agent, Transaction, Activity } from '../api/client';
 import AgentsList from '../components/AgentsList';
@@ -19,8 +21,10 @@ import TransactionHistory from '../components/TransactionHistory';
 import ActivityFeed from '../components/ActivityFeed';
 import CreateAgentModal from '../components/CreateAgentModal';
 import StatsCard from '../components/StatsCard';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Dashboard() {
+  const { user, logout } = useAuth();
   const [agents, setAgents] = useState<Agent[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [activity, setActivity] = useState<Activity[]>([]);
@@ -42,7 +46,17 @@ export default function Dashboard() {
         agentFinanceAPI.getTransactions({ limit: 50 }),
         agentFinanceAPI.getActivity(),
       ]);
-      setAgents(agentsData);
+      
+      // Filter agents by logged-in user
+      // TODO: Backend should filter by user, but for now we do client-side filtering
+      // In production, add userId to metadata when creating agents and filter on backend
+      const userAgents = agentsData.filter(agent => {
+        // For now, show all agents. When backend supports user filtering:
+        // return agent.metadata?.userId === user?.sub || agent.metadata?.userEmail === user?.email;
+        return true; // Remove this line when backend filtering is implemented
+      });
+      
+      setAgents(userAgents);
       setTransactions(transactionsData);
       setActivity(activityData);
     } catch (error) {
@@ -91,7 +105,7 @@ export default function Dashboard() {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <Coins className="h-8 w-8 text-blue-400" />
-                <span className="text-2xl font-bold text-white">Agent Finance</span>
+                <span className="text-2xl font-bold text-white">OpenClaw Pay</span>
               </div>
               <span className="text-slate-400">|</span>
               <span className="text-slate-300 font-medium">Dashboard</span>
@@ -113,6 +127,32 @@ export default function Dashboard() {
                 <Plus className="h-4 w-4" />
                 New Agent
               </button>
+              
+              {/* User Profile */}
+              <div className="flex items-center gap-3 ml-2 pl-3 border-l border-slate-700">
+                {user?.picture ? (
+                  <img 
+                    src={user.picture} 
+                    alt={user.name}
+                    className="h-8 w-8 rounded-full border-2 border-blue-400"
+                  />
+                ) : (
+                  <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center border-2 border-blue-400">
+                    <User className="h-4 w-4 text-white" />
+                  </div>
+                )}
+                <div className="hidden md:block">
+                  <div className="text-sm font-medium text-white">{user?.name}</div>
+                  <div className="text-xs text-slate-400">{user?.email}</div>
+                </div>
+                <button
+                  onClick={logout}
+                  className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                  title="Logout"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+              </div>
             </div>
           </div>
         </div>

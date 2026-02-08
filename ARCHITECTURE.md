@@ -1,4 +1,4 @@
-# Architecture - Agent Finance Infrastructure Layer
+# Architecture - OpenClaw Pay Infrastructure Layer
 
 ## Vision
 

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface CreateAgentModalProps {
   onClose: () => void;
@@ -7,6 +8,7 @@ interface CreateAgentModalProps {
 }
 
 export default function CreateAgentModal({ onClose, onCreate }: CreateAgentModalProps) {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     agentId: '',
     name: '',
@@ -22,7 +24,16 @@ export default function CreateAgentModal({ onClose, onCreate }: CreateAgentModal
     setLoading(true);
 
     try {
-      await onCreate(formData);
+      // Include user information in metadata for agent ownership
+      const dataWithUser = {
+        ...formData,
+        metadata: {
+          userId: user?.sub,
+          userEmail: user?.email,
+          userName: user?.name,
+        },
+      };
+      await onCreate(dataWithUser);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to create agent');
     } finally {
