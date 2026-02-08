@@ -1,13 +1,14 @@
 import { Agent } from '../api/client';
-import { CheckCircle, XCircle, Wallet, CreditCard } from 'lucide-react';
+import { CheckCircle, XCircle, Wallet, CreditCard, Trash2 } from 'lucide-react';
 
 interface AgentsListProps {
   agents: Agent[];
   selectedAgent: Agent | null;
   onSelectAgent: (agent: Agent | null) => void;
+  onDeleteAgent?: (agentId: string, agentName: string) => void;
 }
 
-export default function AgentsList({ agents, selectedAgent, onSelectAgent }: AgentsListProps) {
+export default function AgentsList({ agents, selectedAgent, onSelectAgent, onDeleteAgent }: AgentsListProps) {
   return (
     <div className="bg-dark-card rounded-xl border border-dark-panel shadow-lg">
       <div className="p-6 border-b border-dark-panel">
@@ -53,14 +54,26 @@ export default function AgentsList({ agents, selectedAgent, onSelectAgent }: Age
                     </span>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-sm text-text-tertiary mb-1">Balance</div>
+                <div className="text-right flex flex-col items-end gap-2">
+                  <div className="text-sm text-text-tertiary">Balance</div>
                   <div className="text-lemon font-bold text-lg">
                     ${agent.accounts.reduce((sum, acc) => sum + acc.balance, 0).toLocaleString('en-US', {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}
                   </div>
+                  {onDeleteAgent && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteAgent(agent.id, agent.name);
+                      }}
+                      className="p-2 text-text-muted hover:text-error hover:bg-error/10 rounded-lg transition-colors"
+                      title="Delete agent"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
                 </div>
               </div>
               

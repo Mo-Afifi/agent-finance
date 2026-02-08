@@ -100,6 +100,10 @@ export const agentFinanceAPI = {
     return response.data;
   },
 
+  deleteAgent: async (id: string): Promise<void> => {
+    await apiClient.delete(`/agents/${id}`);
+  },
+
   // Transactions
   getTransactions: async (filters?: {
     agentId?: string;

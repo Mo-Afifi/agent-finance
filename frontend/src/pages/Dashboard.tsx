@@ -15,6 +15,7 @@ import {
   LogOut,
   User
 } from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
 import { agentFinanceAPI, Agent, Transaction, Activity } from '../api/client';
 import AgentsList from '../components/AgentsList';
 import TransactionHistory from '../components/TransactionHistory';
@@ -68,11 +69,61 @@ export default function Dashboard() {
 
   const handleCreateAgent = async (data: any) => {
     try {
-      await agentFinanceAPI.createAgent(data);
-      await loadData();
+      const newAgent = await agentFinanceAPI.createAgent(data);
+      
+      // Close modal first
       setShowCreateModal(false);
-    } catch (error) {
+      
+      // Show success toast
+      toast.success(`Agent "${newAgent.name}" created successfully!`, {
+        duration: 4000,
+        position: 'top-right',
+        icon: '✅',
+      });
+      
+      // Reload data to show new agent
+      await loadData();
+    } catch (error: any) {
       console.error('Failed to create agent:', error);
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message || 'Failed to create agent';
+      toast.error(`Error: ${errorMessage}`, {
+        duration: 5000,
+        position: 'top-right',
+      });
+      throw error; // Re-throw so modal can handle it
+    }
+  };
+
+  const handleDeleteAgent = async (agentId: string, agentName: string) => {
+    // Show confirmation dialog
+    const confirmed = window.confirm(`Are you sure you want to delete agent "${agentName}"? This action cannot be undone.`);
+    
+    if (!confirmed) return;
+    
+    try {
+      await agentFinanceAPI.deleteAgent(agentId);
+      
+      // Show success toast
+      toast.success(`Agent "${agentName}" deleted successfully`, {
+        duration: 4000,
+        position: 'top-right',
+        icon: '🗑️',
+      });
+      
+      // Clear selection if deleted agent was selected
+      if (selectedAgent?.id === agentId) {
+        setSelectedAgent(null);
+      }
+      
+      // Reload data
+      await loadData();
+    } catch (error: any) {
+      console.error('Failed to delete agent:', error);
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message || 'Failed to delete agent';
+      toast.error(`Error: ${errorMessage}`, {
+        duration: 5000,
+        position: 'top-right',
+      });
     }
   };
 
@@ -98,6 +149,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-dark">
+      <Toaster />
       {/* Header */}
       <header className="border-b border-dark-panel bg-dark-lighter/95 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-6 py-4">
@@ -198,6 +250,7 @@ export default function Dashboard() {
               agents={agents}
               selectedAgent={selectedAgent}
               onSelectAgent={setSelectedAgent}
+              onDeleteAgent={handleDeleteAgent}
             />
             <TransactionHistory transactions={transactions} />
           </div>

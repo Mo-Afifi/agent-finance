@@ -34,10 +34,13 @@ export default function CreateAgentModal({ onClose, onCreate }: CreateAgentModal
         },
       };
       await onCreate(dataWithUser);
+      // Success is handled by parent component (Dashboard)
+      // Modal will be closed automatically
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create agent');
-    } finally {
-      setLoading(false);
+      console.error('Create agent error:', err);
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to create agent';
+      setError(errorMessage);
+      setLoading(false); // Only set loading to false on error
     }
   };
 

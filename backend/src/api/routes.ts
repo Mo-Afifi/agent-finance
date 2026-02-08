@@ -228,6 +228,46 @@ export async function registerRoutes(app: FastifyInstance, sdk: AgentFinanceSDK)
   );
 
   /**
+   * DELETE /agents/:id
+   * Delete an agent
+   * Requires API key authentication and ownership
+   */
+  app.delete(
+    '/agents/:id',
+    { preHandler: requireAuth },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        if (!request.user) {
+          return reply.code(401).send({
+            success: false,
+            error: 'Not authenticated',
+          });
+        }
+
+        const { id } = request.params as { id: string };
+        
+        // Check ownership
+        if (!(await checkAgentOwnership(request, reply, id))) return;
+
+        // Delete agent-user relationship from storage
+        await userStorage.deleteAgent(id, request.user.userId);
+        
+        return reply.code(200).send({
+          success: true,
+          message: 'Agent deleted successfully',
+        });
+      } catch (error: any) {
+        request.log.error(error, 'Failed to delete agent');
+        return reply.code(500).send({
+          success: false,
+          error: 'Failed to delete agent',
+          message: error.message,
+        });
+      }
+    }
+  );
+
+  /**
    * GET /transactions
    * List transactions (stub for now)
    */

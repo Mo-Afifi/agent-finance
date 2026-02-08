@@ -227,6 +227,25 @@ class UserStorage {
     const agent = this.agents.get(agentId);
     return agent?.userId === userId;
   }
+
+  /**
+   * Delete an agent
+   */
+  async deleteAgent(agentId: string, userId: string): Promise<void> {
+    await this.init();
+    
+    const agent = this.agents.get(agentId);
+    if (!agent) {
+      throw new Error('Agent not found');
+    }
+    
+    if (agent.userId !== userId) {
+      throw new Error('Unauthorized: You do not own this agent');
+    }
+    
+    this.agents.delete(agentId);
+    await this.persist();
+  }
 }
 
 // Singleton instance
