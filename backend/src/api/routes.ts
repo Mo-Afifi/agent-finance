@@ -90,6 +90,27 @@ export async function registerRoutes(app: FastifyInstance, sdk: AgentFinanceSDK)
   });
 
   /**
+   * POST /agents
+   * Alias for /api/agents/register (dashboard compatibility)
+   */
+  app.post('/agents', async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      const body = RegisterAgentSchema.parse(request.body);
+      const agent = await sdk.registerAgent(body);
+      
+      return reply.code(201).send({
+        success: true,
+        data: agent,
+      });
+    } catch (error: any) {
+      return reply.code(400).send({
+        success: false,
+        error: error.message,
+      });
+    }
+  });
+
+  /**
    * GET /transactions
    * List transactions (stub for now)
    */
