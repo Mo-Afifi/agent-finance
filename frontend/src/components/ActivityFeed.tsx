@@ -15,17 +15,17 @@ export default function ActivityFeed({ activity }: ActivityFeedProps) {
   const getActivityIcon = (type: Activity['type']) => {
     switch (type) {
       case 'payment_sent':
-        return <TrendingUp className="h-4 w-4 text-red-400" />;
+        return <TrendingUp className="h-4 w-4 text-error" />;
       case 'payment_received':
-        return <TrendingDown className="h-4 w-4 text-green-400" />;
+        return <TrendingDown className="h-4 w-4 text-success" />;
       case 'wallet_created':
-        return <Wallet className="h-4 w-4 text-blue-400" />;
+        return <Wallet className="h-4 w-4 text-lemon" />;
       case 'account_created':
-        return <CreditCard className="h-4 w-4 text-blue-400" />;
+        return <CreditCard className="h-4 w-4 text-lemon" />;
       case 'verification_completed':
-        return <CheckCircle className="h-4 w-4 text-green-400" />;
+        return <CheckCircle className="h-4 w-4 text-success" />;
       default:
-        return <CheckCircle className="h-4 w-4 text-slate-400" />;
+        return <CheckCircle className="h-4 w-4 text-text-muted" />;
     }
   };
 
@@ -45,24 +45,24 @@ export default function ActivityFeed({ activity }: ActivityFeedProps) {
   };
 
   return (
-    <div className="bg-slate-800 rounded-xl border border-slate-700 sticky top-24">
-      <div className="p-6 border-b border-slate-700">
-        <h2 className="text-xl font-bold text-white">Activity Feed</h2>
-        <p className="text-slate-400 text-sm mt-1">Real-time updates</p>
+    <div className="bg-dark-card rounded-xl border border-dark-panel shadow-lg sticky top-24">
+      <div className="p-6 border-b border-dark-panel">
+        <h2 className="text-xl font-bold text-text-primary">Activity Feed</h2>
+        <p className="text-text-tertiary text-sm mt-1">Real-time updates</p>
       </div>
-      <div className="divide-y divide-slate-700 max-h-[700px] overflow-y-auto">
+      <div className="divide-y divide-dark-panel max-h-[700px] overflow-y-auto">
         {activity.length === 0 ? (
           <div className="p-8 text-center">
-            <p className="text-slate-400">No recent activity.</p>
+            <p className="text-text-tertiary">No recent activity.</p>
           </div>
         ) : (
           activity.map((item) => (
-            <div key={item.id} className="p-4 hover:bg-slate-700/30 transition-colors">
+            <div key={item.id} className="p-4 hover:bg-dark-panel/50 transition-colors">
               <div className="flex items-start gap-3">
                 <div className="mt-1">{getActivityIcon(item.type)}</div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-white text-sm mb-1">{item.description}</p>
-                  <p className="text-slate-500 text-xs">{formatTime(item.timestamp)}</p>
+                  <p className="text-text-primary text-sm mb-1">{item.description}</p>
+                  <p className="text-text-muted text-xs">{formatTime(item.timestamp)}</p>
                 </div>
               </div>
             </div>

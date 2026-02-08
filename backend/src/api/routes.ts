@@ -71,6 +71,32 @@ export async function registerRoutes(app: FastifyInstance, sdk: AgentFinanceSDK)
     };
   });
 
+  // ==================== Quick Endpoints for Dashboard ====================
+
+  /**
+   * GET /activity
+   * Get recent activity (stub for now)
+   */
+  app.get('/activity', async (request, reply) => {
+    return reply.send([]);
+  });
+
+  /**
+   * GET /agents
+   * List all agents (stub for now)
+   */
+  app.get('/agents', async (request, reply) => {
+    return reply.send([]);
+  });
+
+  /**
+   * GET /transactions
+   * List transactions (stub for now)
+   */
+  app.get('/transactions', async (request, reply) => {
+    return reply.send([]);
+  });
+
   // ==================== Agent Identity ====================
 
   /**

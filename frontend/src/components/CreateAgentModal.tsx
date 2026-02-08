@@ -42,13 +42,13 @@ export default function CreateAgentModal({ onClose, onCreate }: CreateAgentModal
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-slate-800 rounded-xl border border-slate-700 max-w-md w-full">
-        <div className="flex items-center justify-between p-6 border-b border-slate-700">
-          <h2 className="text-xl font-bold text-white">Register New Agent</h2>
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-dark-card rounded-xl border border-dark-panel max-w-md w-full shadow-2xl shadow-lemon/10">
+        <div className="flex items-center justify-between p-6 border-b border-dark-panel">
+          <h2 className="text-xl font-bold text-text-primary">Register New Agent</h2>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white transition-colors"
+            className="text-text-tertiary hover:text-lemon transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -56,13 +56,13 @@ export default function CreateAgentModal({ onClose, onCreate }: CreateAgentModal
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 text-red-400 text-sm">
+            <div className="bg-error/10 border border-error/50 rounded-lg p-3 text-error text-sm">
               {error}
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
+            <label className="block text-sm font-medium text-text-secondary mb-2">
               Agent ID
             </label>
             <input
@@ -71,13 +71,13 @@ export default function CreateAgentModal({ onClose, onCreate }: CreateAgentModal
               value={formData.agentId}
               onChange={(e) => setFormData({ ...formData, agentId: e.target.value })}
               placeholder="my-agent-123"
-              className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+              className="w-full px-4 py-2 bg-dark border border-dark-panel rounded-lg text-text-primary placeholder-text-muted focus:outline-none focus:border-lemon focus:ring-1 focus:ring-lemon transition-colors"
             />
-            <p className="text-slate-500 text-xs mt-1">Unique identifier for this agent</p>
+            <p className="text-text-muted text-xs mt-1">Unique identifier for this agent</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
+            <label className="block text-sm font-medium text-text-secondary mb-2">
               Agent Name
             </label>
             <input
@@ -86,18 +86,18 @@ export default function CreateAgentModal({ onClose, onCreate }: CreateAgentModal
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="MyAgent"
-              className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+              className="w-full px-4 py-2 bg-dark border border-dark-panel rounded-lg text-text-primary placeholder-text-muted focus:outline-none focus:border-lemon focus:ring-1 focus:ring-lemon transition-colors"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
+            <label className="block text-sm font-medium text-text-secondary mb-2">
               Agent Type
             </label>
             <select
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value as 'openclaw' | 'custom' })}
-              className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+              className="w-full px-4 py-2 bg-dark border border-dark-panel rounded-lg text-text-primary focus:outline-none focus:border-lemon focus:ring-1 focus:ring-lemon transition-colors"
             >
               <option value="openclaw">OpenClaw</option>
               <option value="custom">Custom</option>
@@ -105,7 +105,7 @@ export default function CreateAgentModal({ onClose, onCreate }: CreateAgentModal
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
+            <label className="block text-sm font-medium text-text-secondary mb-2">
               Email (Optional)
             </label>
             <input
@@ -113,23 +113,23 @@ export default function CreateAgentModal({ onClose, onCreate }: CreateAgentModal
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               placeholder="[email protected]"
-              className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+              className="w-full px-4 py-2 bg-dark border border-dark-panel rounded-lg text-text-primary placeholder-text-muted focus:outline-none focus:border-lemon focus:ring-1 focus:ring-lemon transition-colors"
             />
-            <p className="text-slate-500 text-xs mt-1">For notifications and verification</p>
+            <p className="text-text-muted text-xs mt-1">For notifications and verification</p>
           </div>
 
           <div className="flex gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors font-medium"
+              className="flex-1 px-4 py-2 bg-dark-panel hover:bg-dark-panel/70 text-text-primary rounded-lg transition-colors font-medium border border-dark-panel"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 bg-lemon hover:bg-gold text-dark rounded-lg transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-lemon/20"
             >
               {loading ? 'Creating...' : 'Create Agent'}
             </button>

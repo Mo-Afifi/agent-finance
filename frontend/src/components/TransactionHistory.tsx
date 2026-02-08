@@ -9,22 +9,22 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
   const getStatusIcon = (status: Transaction['status']) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle className="h-4 w-4 text-green-400" />;
+        return <CheckCircle className="h-4 w-4 text-success" />;
       case 'pending':
-        return <Clock className="h-4 w-4 text-yellow-400" />;
+        return <Clock className="h-4 w-4 text-lemon" />;
       case 'failed':
-        return <XCircle className="h-4 w-4 text-red-400" />;
+        return <XCircle className="h-4 w-4 text-error" />;
     }
   };
 
   const getStatusColor = (status: Transaction['status']) => {
     switch (status) {
       case 'completed':
-        return 'text-green-400';
+        return 'text-success';
       case 'pending':
-        return 'text-yellow-400';
+        return 'text-lemon';
       case 'failed':
-        return 'text-red-400';
+        return 'text-error';
     }
   };
 
@@ -38,22 +38,22 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
   };
 
   return (
-    <div className="bg-slate-800 rounded-xl border border-slate-700">
-      <div className="p-6 border-b border-slate-700">
-        <h2 className="text-xl font-bold text-white">Transaction History</h2>
-        <p className="text-slate-400 text-sm mt-1">
+    <div className="bg-dark-card rounded-xl border border-dark-panel shadow-lg">
+      <div className="p-6 border-b border-dark-panel">
+        <h2 className="text-xl font-bold text-text-primary">Transaction History</h2>
+        <p className="text-text-tertiary text-sm mt-1">
           Recent agent-to-agent transfers
         </p>
       </div>
-      <div className="divide-y divide-slate-700 max-h-[600px] overflow-y-auto">
+      <div className="divide-y divide-dark-panel max-h-[600px] overflow-y-auto">
         {transactions.length === 0 ? (
           <div className="p-12 text-center">
-            <p className="text-slate-400">No transactions yet.</p>
-            <p className="text-slate-500 text-sm mt-2">Transactions will appear here.</p>
+            <p className="text-text-tertiary">No transactions yet.</p>
+            <p className="text-text-muted text-sm mt-2">Transactions will appear here.</p>
           </div>
         ) : (
           transactions.map((tx) => (
-            <div key={tx.id} className="p-4 hover:bg-slate-700/30 transition-colors">
+            <div key={tx.id} className="p-4 hover:bg-dark-panel/50 transition-colors">
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-3 flex-1">
                   <div className={`flex items-center gap-1 ${getStatusColor(tx.status)}`}>
@@ -61,34 +61,34 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 text-sm mb-1">
-                      <span className="text-white font-medium truncate max-w-[150px]">
+                      <span className="text-text-primary font-medium truncate max-w-[150px]">
                         {tx.fromAgent}
                       </span>
-                      <ArrowRight className="h-3 w-3 text-slate-500 flex-shrink-0" />
-                      <span className="text-white font-medium truncate max-w-[150px]">
+                      <ArrowRight className="h-3 w-3 text-text-muted flex-shrink-0" />
+                      <span className="text-text-primary font-medium truncate max-w-[150px]">
                         {tx.toAgent}
                       </span>
                     </div>
                     {tx.memo && (
-                      <p className="text-slate-400 text-xs">{tx.memo}</p>
+                      <p className="text-text-tertiary text-xs">{tx.memo}</p>
                     )}
                   </div>
                 </div>
                 <div className="text-right ml-4">
-                  <div className="text-white font-semibold">
+                  <div className="text-lemon font-bold">
                     {tx.amount.toLocaleString('en-US', {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })} {tx.currency}
                   </div>
-                  <div className="text-slate-500 text-xs mt-1">
+                  <div className="text-text-muted text-xs mt-1">
                     {formatDate(tx.createdAt)}
                   </div>
                 </div>
               </div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-500 font-mono">{tx.id}</span>
-                <span className={`capitalize ${getStatusColor(tx.status)}`}>
+                <span className="text-text-muted font-mono">{tx.id}</span>
+                <span className={`capitalize font-medium ${getStatusColor(tx.status)}`}>
                   {tx.status}
                 </span>
               </div>

@@ -7,17 +7,49 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
+        // Dark theme backgrounds
+        dark: {
+          DEFAULT: '#000000',
+          lighter: '#0a0a0a',
+          card: '#1a1a1a',
+          panel: '#262626',
+        },
+        // Lemon/Gold accent colors
+        lemon: {
+          50: '#fefce8',
+          100: '#fef9c3',
+          200: '#fef08a',
+          300: '#fde047',
+          400: '#facc15',
+          DEFAULT: '#F4E04D', // Primary lemon
+          500: '#F4E04D',
+          600: '#ca8a04',
+          700: '#a16207',
+          800: '#854d0e',
+          900: '#713f12',
+        },
+        gold: {
+          DEFAULT: '#FFD700',
+          light: '#FFE55C',
+          dark: '#CCA300',
+        },
+        // Text colors
+        text: {
+          primary: '#ffffff',
+          secondary: '#d1d5db',
+          tertiary: '#9ca3af',
+          muted: '#6b7280',
+        },
+        // Keep success and error states
+        success: {
+          DEFAULT: '#10b981',
+          light: '#34d399',
+          dark: '#059669',
+        },
+        error: {
+          DEFAULT: '#ef4444',
+          light: '#f87171',
+          dark: '#dc2626',
         },
       },
     },

@@ -90,64 +90,64 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+      <div className="min-h-screen bg-dark flex items-center justify-center">
+        <div className="text-text-primary text-xl">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-dark">
       {/* Header */}
-      <header className="border-b border-slate-800 bg-slate-900/95 backdrop-blur-sm sticky top-0 z-10">
+      <header className="border-b border-dark-panel bg-dark-lighter/95 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <Coins className="h-8 w-8 text-blue-400" />
-                <span className="text-2xl font-bold text-white">OpenClaw Pay</span>
+                <Coins className="h-8 w-8 text-lemon" />
+                <span className="text-2xl font-bold text-text-primary">OpenClaw Pay</span>
               </div>
-              <span className="text-slate-400">|</span>
-              <span className="text-slate-300 font-medium">Dashboard</span>
+              <span className="text-text-tertiary">|</span>
+              <span className="text-text-secondary font-medium">Dashboard</span>
             </div>
             <div className="flex items-center gap-3">
               <a
                 href="https://smart-agent-cash.lovable.app"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2 text-slate-300 hover:text-white transition-colors flex items-center gap-2"
+                className="px-4 py-2 text-text-secondary hover:text-lemon transition-colors flex items-center gap-2"
               >
                 <ExternalLink className="h-4 w-4" />
                 About
               </a>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium flex items-center gap-2"
+                className="px-4 py-2 bg-lemon hover:bg-gold text-dark rounded-lg transition-colors font-semibold flex items-center gap-2 shadow-lg shadow-lemon/20"
               >
                 <Plus className="h-4 w-4" />
                 New Agent
               </button>
               
               {/* User Profile */}
-              <div className="flex items-center gap-3 ml-2 pl-3 border-l border-slate-700">
+              <div className="flex items-center gap-3 ml-2 pl-3 border-l border-dark-panel">
                 {user?.picture ? (
                   <img 
                     src={user.picture} 
                     alt={user.name}
-                    className="h-8 w-8 rounded-full border-2 border-blue-400"
+                    className="h-8 w-8 rounded-full border-2 border-lemon"
                   />
                 ) : (
-                  <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center border-2 border-blue-400">
-                    <User className="h-4 w-4 text-white" />
+                  <div className="h-8 w-8 rounded-full bg-lemon flex items-center justify-center border-2 border-gold">
+                    <User className="h-4 w-4 text-dark" />
                   </div>
                 )}
                 <div className="hidden md:block">
-                  <div className="text-sm font-medium text-white">{user?.name}</div>
-                  <div className="text-xs text-slate-400">{user?.email}</div>
+                  <div className="text-sm font-medium text-text-primary">{user?.name}</div>
+                  <div className="text-xs text-text-tertiary">{user?.email}</div>
                 </div>
                 <button
                   onClick={logout}
-                  className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                  className="p-2 text-text-tertiary hover:text-lemon hover:bg-dark-card rounded-lg transition-colors"
                   title="Logout"
                 >
                   <LogOut className="h-4 w-4" />
