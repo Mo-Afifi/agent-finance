@@ -8,10 +8,10 @@ cd /root/.openclaw/workspace/agent-finance/backend
 npm install
 ```
 
-### 2. Verify Environment Variables
-Your `.env` file should already exist at `/root/.openclaw/workspace/.env` with:
+### 2. Configure Environment Variables
+Create a `.env` file at `/root/.openclaw/workspace/.env`:
 ```env
-HIFI_API_KEY=zpka_f664d0849d984255a869237fe87c724b_22a1635f
+HIFI_API_KEY=your_hifi_api_key_here
 HIFI_ENVIRONMENT=sandbox
 HIFI_BASE_URL=https://sandbox.hifibridge.com
 ```

@@ -1,6 +1,8 @@
 # Quick Start Guide
 
-Get the Agent Finance frontend running in 60 seconds.
+Get the Agent Finance Dashboard running in 60 seconds.
+
+> **Note**: The landing page is hosted separately on [Lovable](https://smart-agent-cash.lovable.app). This is the **Dashboard app only**.
 
 ## Prerequisites
 
@@ -33,18 +35,11 @@ npm run dev
 Open http://localhost:5173 in your browser.
 
 **You'll see:**
-1. Landing page at `/`
-2. Dashboard at `/dashboard`
+- Dashboard at `/` (default route)
 
 ## What to Test
 
-### Landing Page (/)
-- [x] Hero section loads
-- [x] Use cases displayed
-- [x] Code example visible
-- [x] "Access Dashboard" button works
-
-### Dashboard (/dashboard)
+### Dashboard (/)
 - [x] Stats cards show metrics
 - [x] Agents list appears (or empty state)
 - [x] Transaction history (or empty state)

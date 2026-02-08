@@ -1,14 +1,10 @@
-# Agent Finance Frontend
+# Agent Finance Dashboard
 
-Modern, responsive web interface for the Agent Finance infrastructure layer.
+Management interface for the Agent Finance infrastructure layer.
+
+> **Note**: The landing page is hosted separately on [Lovable](https://smart-agent-cash.lovable.app). This app is the **Dashboard only**.
 
 ## Features
-
-### Landing Page
-- **Marketing Overview**: Clear explanation of what Agent Finance does
-- **Use Cases**: Real-world examples of agent-to-agent payments
-- **Getting Started**: Code examples and API documentation links
-- **Call-to-Action**: Direct access to dashboard
 
 ### Dashboard
 - **Agent Management**: View and register AI agents
@@ -54,7 +50,9 @@ cp .env.example .env
 npm run dev
 ```
 
-The app will be available at `http://localhost:5173`
+The dashboard will be available at `http://localhost:5173`
+
+The landing page at [https://smart-agent-cash.lovable.app](https://smart-agent-cash.lovable.app) will link to this dashboard when deployed.
 
 ### Build
 
@@ -90,8 +88,7 @@ frontend/
 │   │   ├── CreateAgentModal.tsx
 │   │   └── StatsCard.tsx      # Reusable stats display
 │   ├── pages/
-│   │   ├── LandingPage.tsx    # Marketing page
-│   │   └── Dashboard.tsx      # Main dashboard
+│   │   └── Dashboard.tsx      # Main dashboard (default route)
 │   ├── App.tsx                # Router configuration
 │   ├── main.tsx               # Entry point
 │   └── index.css              # Global styles + Tailwind
@@ -128,13 +125,6 @@ The frontend expects the following API endpoints:
 See `src/api/client.ts` for full type definitions.
 
 ## Features in Detail
-
-### Landing Page
-- Clean, modern design with gradient backgrounds
-- Responsive layout for all screen sizes
-- Interactive sections explaining agent finance concepts
-- Code examples showing API usage
-- Direct navigation to dashboard
 
 ### Dashboard Components
 

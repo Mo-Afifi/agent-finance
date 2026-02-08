@@ -11,9 +11,8 @@ import {
   CheckCircle,
   Clock,
   XCircle,
-  Home
+  ExternalLink
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { agentFinanceAPI, Agent, Transaction, Activity } from '../api/client';
 import AgentsList from '../components/AgentsList';
 import TransactionHistory from '../components/TransactionHistory';
@@ -22,7 +21,6 @@ import CreateAgentModal from '../components/CreateAgentModal';
 import StatsCard from '../components/StatsCard';
 
 export default function Dashboard() {
-  const navigate = useNavigate();
   const [agents, setAgents] = useState<Agent[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [activity, setActivity] = useState<Activity[]>([]);
@@ -99,13 +97,15 @@ export default function Dashboard() {
               <span className="text-slate-300 font-medium">Dashboard</span>
             </div>
             <div className="flex items-center gap-3">
-              <button
-                onClick={() => navigate('/')}
+              <a
+                href="https://smart-agent-cash.lovable.app"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="px-4 py-2 text-slate-300 hover:text-white transition-colors flex items-center gap-2"
               >
-                <Home className="h-4 w-4" />
-                Home
-              </button>
+                <ExternalLink className="h-4 w-4" />
+                About
+              </a>
               <button
                 onClick={() => setShowCreateModal(true)}
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium flex items-center gap-2"
