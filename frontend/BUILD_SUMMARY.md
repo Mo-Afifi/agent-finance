@@ -1,17 +1,11 @@
-# Frontend Build Summary
+# Dashboard Build Summary
+
+> **Note**: The landing page exists separately on [Lovable](https://smart-agent-cash.lovable.app). This build focuses on the **Dashboard only**.
 
 ## ✅ Completed
 
-### Pages (2)
-1. **Landing Page** (`src/pages/LandingPage.tsx`)
-   - Hero section with value proposition
-   - "What It Does" feature cards (3 key features)
-   - Use cases grid (4 examples)
-   - Getting started with code example
-   - Call-to-action buttons
-   - Footer with navigation
-
-2. **Dashboard** (`src/pages/Dashboard.tsx`)
+### Pages (1)
+1. **Dashboard** (`src/pages/Dashboard.tsx`) - Default route at `/`
    - Header with navigation and "New Agent" button
    - Stats overview (4 cards):
      - Total Balance (with trend)
@@ -77,8 +71,9 @@
 ### Routing (`src/App.tsx`)
 - React Router setup
 - Routes:
-  - `/` → Landing Page
-  - `/dashboard` → Dashboard
+  - `/` → Dashboard (default)
+  - `/dashboard` → Redirects to `/`
+- Link to external landing page: https://smart-agent-cash.lovable.app
 
 ### Styling
 - **Tailwind CSS v3** for utility classes
@@ -126,11 +121,11 @@
 ## 📊 Statistics
 
 ### Code Files
-- **TypeScript/TSX files**: 10
-- **Pages**: 2 (Landing, Dashboard)
+- **TypeScript/TSX files**: 9
+- **Pages**: 1 (Dashboard)
 - **Components**: 5 (reusable UI)
 - **API client**: 1 (with full types)
-- **Lines of code**: ~1,200
+- **Lines of code**: ~900
 
 ### Dependencies
 **Production:**
@@ -148,10 +143,10 @@
 - postcss + autoprefixer (CSS processing)
 
 ### Bundle Size (Production)
-- **CSS**: 15.35 KB (3.75 KB gzipped)
-- **JS**: 293.34 KB (95.10 KB gzipped)
-- **HTML**: 0.46 KB (0.29 KB gzipped)
-- **Total**: ~99 KB gzipped
+- **CSS**: 12.76 KB (3.29 KB gzipped)
+- **JS**: 285.11 KB (92.86 KB gzipped)
+- **HTML**: 0.59 KB (0.35 KB gzipped)
+- **Total**: ~96 KB gzipped (even smaller without landing page!)
 
 ## 🎨 Design Highlights
 
@@ -180,16 +175,6 @@
 
 ## 🚀 Features Implemented
 
-### Landing Page ✅
-- [x] Hero section with gradient background
-- [x] Value proposition (financial infra for AI agents)
-- [x] Feature cards (3 features)
-- [x] Use cases grid (4 use cases)
-- [x] Code example (agent registration flow)
-- [x] Call-to-action buttons
-- [x] Responsive layout
-- [x] Footer with links
-
 ### Dashboard ✅
 - [x] Stats overview (4 metrics)
 - [x] Agents list with expandable details
@@ -216,12 +201,13 @@
 - [x] Easy setup (npm install + npm run dev)
 
 ### Production Ready ✅
-- [x] Optimized build (<100KB gzipped)
+- [x] Optimized build (~96KB gzipped)
 - [x] Tree-shaking for smaller bundles
 - [x] CSS purging (Tailwind)
 - [x] Environment variables
 - [x] Gitignore for secrets
 - [x] Deployment guides (Vercel, Netlify, manual)
+- [x] Links to external landing page (Lovable)
 
 ## 🔧 Technical Decisions
 
@@ -288,23 +274,26 @@ When backend is ready:
 
 ## ✨ Summary
 
-**A complete, production-ready frontend for Agent Finance** with:
+**A complete, production-ready Dashboard for Agent Finance** with:
 - 🎨 Clean, modern UI (Tailwind CSS)
 - ⚡ Fast development (Vite + HMR)
 - 🔒 Type-safe (TypeScript)
 - 📱 Responsive design (mobile-first)
 - 📊 Real-time monitoring (auto-refresh)
-- 🚀 Optimized bundle (~99KB gzipped)
+- 🚀 Optimized bundle (~96KB gzipped)
 - 📚 Comprehensive documentation
+- 🔗 Links to external landing page (Lovable)
 
 **Ready to deploy** on Vercel, Netlify, or any static host.
 
+**Integrates with**: [Landing page on Lovable](https://smart-agent-cash.lovable.app)
+
 **Built in**: ~2 hours of focused development.
 
-**Lines of code**: ~1,200 (including comments).
+**Lines of code**: ~900 (including comments).
 
 **Test coverage**: Manual testing completed, build verified.
 
 ---
 
-🎉 **Frontend complete!**
+🎉 **Dashboard complete!**

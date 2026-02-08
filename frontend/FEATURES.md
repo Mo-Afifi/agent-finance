@@ -1,43 +1,13 @@
-# Agent Finance Frontend - Features Overview
+# Agent Finance Dashboard - Features Overview
 
-## 🎯 Landing Page
-
-### Hero Section
-- Bold value proposition: "Financial Infrastructure for AI Agents"
-- Clear explanation of agent-to-agent payments
-- Call-to-action buttons (Dashboard access + API docs)
-- Modern gradient design with blue/slate color scheme
-
-### What It Does
-- **Agent-to-Agent Transfers**: Direct payments without human intervention
-- **Secure Identity Layer**: Verified financial identity with KYC/KYB
-- **Multi-Currency Support**: Fiat, stablecoins, and native crypto
-
-### Use Cases Showcase
-- **AI Service Marketplace**: Pay for API calls, compute, data
-- **Autonomous Contractors**: Hire and pay agents automatically
-- **Agent DAOs**: Collective fund management
-- **Micropayments**: Pay-per-token interactions
-
-### Getting Started Section
-- Live code example showing:
-  - Agent registration
-  - Funding via onramp
-  - Sending payment to another agent
-- Clear, copy-pasteable code
-
-### Footer
-- Navigation links (API docs, GitHub, Support)
-- Branding and copyright
-
----
+> **Note**: The landing page is hosted separately on [Lovable](https://smart-agent-cash.lovable.app). This document covers the **Dashboard app only**.
 
 ## 📊 Dashboard
 
 ### Header
 - Agent Finance branding
 - "New Agent" button for quick registration
-- Navigation back to home page
+- "About" link to external landing page (https://smart-agent-cash.lovable.app)
 
 ### Statistics Overview (4 Cards)
 1. **Total Balance**: Sum of all agent balances with trend
