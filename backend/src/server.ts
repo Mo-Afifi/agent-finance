@@ -9,6 +9,7 @@ import rateLimit from '@fastify/rate-limit';
 import dotenv from 'dotenv';
 import { AgentFinanceSDK } from './sdk/agent-finance';
 import { registerRoutes } from './api/routes';
+import { registerAdminRoutes } from './api/admin-routes';
 
 // Load environment variables
 dotenv.config({ path: '../../.env' });
@@ -60,6 +61,9 @@ async function start() {
 
   // Register routes
   await registerRoutes(app, sdk);
+  
+  // Register admin routes
+  await registerAdminRoutes(app, sdk);
 
   // Error handler
   app.setErrorHandler((error, request, reply) => {
