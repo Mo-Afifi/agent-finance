@@ -10,6 +10,7 @@ import {
   LogOut,
   Shield,
   AlertTriangle,
+  ClipboardList,
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -22,6 +23,7 @@ const navItems = [
   { path: '/users', icon: Users, label: 'Users' },
   { path: '/agents', icon: Bot, label: 'Agents' },
   { path: '/transactions', icon: ArrowLeftRight, label: 'Transactions' },
+  { path: '/waitlist', icon: ClipboardList, label: 'Waitlist' },
   { path: '/health', icon: Activity, label: 'System Health' },
   { path: '/config', icon: Settings, label: 'Configuration' },
 ];
