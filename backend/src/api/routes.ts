@@ -13,8 +13,9 @@ import { userStorage } from '../auth/storage';
 const RegisterAgentSchema = z.object({
   agentId: z.string().min(1),
   name: z.string().min(1),
-  email: z.string().email(),
-  type: z.enum(['individual', 'business']).default('individual'),
+  email: z.string().email().optional(),
+  type: z.enum(['openclaw', 'custom', 'individual', 'business']).default('openclaw'),
+  metadata: z.record(z.any()).optional(),
 });
 
 const SendPaymentSchema = z.object({

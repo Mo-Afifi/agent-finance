@@ -19,15 +19,16 @@ import type {
 export interface AgentIdentity {
   agentId: string;
   name: string;
-  email: string;
-  type: 'individual' | 'business';
+  email?: string;
+  type: 'individual' | 'business' | 'openclaw' | 'custom';
+  metadata?: Record<string, any>;
 }
 
 export interface AgentAccount {
   agentId: string;
   hifiUserId: string;
   name: string;
-  email: string;
+  email?: string;
   wallets: Record<Chain, string>; // chain -> address
   verified: boolean;
   createdAt: Date;
@@ -64,13 +65,17 @@ export class AgentFinanceSDK {
   async registerAgent(identity: AgentIdentity): Promise<AgentAccount> {
     const requestId = uuidv4();
     
+    // Map type: openclaw/custom -> individual, business -> business
+    const hifiType = (identity.type === 'business') ? 'business' : 'individual';
+    const isIndividual = hifiType === 'individual';
+    
     const user = await this.hifi.createUser({
-      type: identity.type,
-      firstName: identity.type === 'individual' ? identity.name.split(' ')[0] : undefined,
-      lastName: identity.type === 'individual' ? identity.name.split(' ').slice(1).join(' ') || 'Agent' : undefined,
-      dateOfBirth: identity.type === 'individual' ? '1990-01-01' : undefined, // Default DOB for agents
-      businessName: identity.type === 'business' ? identity.name : undefined,
-      email: identity.email,
+      type: hifiType,
+      firstName: isIndividual ? identity.name.split(' ')[0] : undefined,
+      lastName: isIndividual ? identity.name.split(' ').slice(1).join(' ') || 'Agent' : undefined,
+      dateOfBirth: isIndividual ? '1990-01-01' : undefined, // Default DOB for agents
+      businessName: !isIndividual ? identity.name : undefined,
+      email: identity.email || `agent-${identity.agentId}@openclawpay.ai`,
       signedAgreementId: 'agent-tos-v1', // Would be actual ToS agreement ID
       requestId,
       chains: ['POLYGON', 'ETHEREUM'],
