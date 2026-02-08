@@ -5,6 +5,8 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import { AgentFinanceSDK } from '../sdk/agent-finance';
+import { requireAuth, optionalAuth } from '../auth/middleware';
+import { userStorage } from '../auth/storage';
 
 // ==================== Request Schemas ====================
 
@@ -59,6 +61,35 @@ const WithdrawToFiatSchema = z.object({
 
 // ==================== Route Handlers ====================
 
+/**
+ * Helper: Check if user owns agent
+ */
+async function checkAgentOwnership(
+  request: FastifyRequest,
+  reply: FastifyReply,
+  agentId: string
+): Promise<boolean> {
+  if (!request.user) {
+    reply.code(401).send({
+      success: false,
+      error: 'Not authenticated',
+    });
+    return false;
+  }
+
+  const ownsAgent = await userStorage.userOwnsAgent(request.user.userId, agentId);
+  if (!ownsAgent) {
+    reply.code(403).send({
+      success: false,
+      error: 'Forbidden',
+      message: 'You do not own this agent',
+    });
+    return false;
+  }
+
+  return true;
+}
+
 export async function registerRoutes(app: FastifyInstance, sdk: AgentFinanceSDK) {
   
   // Health check
@@ -77,45 +108,201 @@ export async function registerRoutes(app: FastifyInstance, sdk: AgentFinanceSDK)
    * GET /activity
    * Get recent activity (stub for now)
    */
-  app.get('/activity', async (request, reply) => {
+  app.get('/activity', { preHandler: optionalAuth }, async (request, reply) => {
+    // Stub: Return empty array for now
+    // TODO: Implement activity tracking system
     return reply.send([]);
   });
 
   /**
    * GET /agents
-   * List all agents (stub for now)
+   * List all agents for the authenticated user
+   * Requires API key authentication
    */
-  app.get('/agents', async (request, reply) => {
-    return reply.send([]);
-  });
+  app.get(
+    '/agents',
+    { preHandler: requireAuth },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        if (!request.user) {
+          return reply.code(401).send({
+            success: false,
+            error: 'Not authenticated',
+          });
+        }
+
+        const userAgents = await userStorage.getAgentsByUserId(request.user.userId);
+        
+        // Transform to match frontend Agent interface
+        const agents = await Promise.all(
+          userAgents.map(async (ua) => {
+            try {
+              // Try to get full agent details from SDK
+              const agentDetails = await sdk.getAgent(ua.agentId);
+              return {
+                id: ua.agentId,
+                name: ua.name,
+                type: 'openclaw' as const,
+                hifiUserId: agentDetails.hifiUserId || '',
+                wallets: [],
+                accounts: [],
+                verified: agentDetails.verified || false,
+                createdAt: ua.createdAt,
+                metadata: {},
+              };
+            } catch {
+              // If SDK fails, return minimal data
+              return {
+                id: ua.agentId,
+                name: ua.name,
+                type: 'openclaw' as const,
+                hifiUserId: '',
+                wallets: [],
+                accounts: [],
+                verified: false,
+                createdAt: ua.createdAt,
+                metadata: {},
+              };
+            }
+          })
+        );
+
+        return reply.send(agents);
+      } catch (error: any) {
+        request.log.error(error, 'Failed to list agents');
+        return reply.code(500).send({
+          success: false,
+          error: 'Failed to list agents',
+          message: error.message,
+        });
+      }
+    }
+  );
 
   /**
    * POST /agents
    * Alias for /api/agents/register (dashboard compatibility)
+   * Requires API key authentication
    */
-  app.post('/agents', async (request: FastifyRequest, reply: FastifyReply) => {
-    try {
-      const body = RegisterAgentSchema.parse(request.body);
-      const agent = await sdk.registerAgent(body);
-      
-      return reply.code(201).send({
-        success: true,
-        data: agent,
-      });
-    } catch (error: any) {
-      return reply.code(400).send({
-        success: false,
-        error: error.message,
-      });
+  app.post(
+    '/agents',
+    { preHandler: requireAuth },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        if (!request.user) {
+          return reply.code(401).send({
+            success: false,
+            error: 'Not authenticated',
+          });
+        }
+
+        const body = RegisterAgentSchema.parse(request.body);
+        
+        // Register agent with HIFI
+        const agent = await sdk.registerAgent(body);
+        
+        // Store agent-user relationship
+        await userStorage.registerAgent(body.agentId, request.user.userId, body.name);
+        
+        // Return format matching frontend Agent interface
+        return reply.code(201).send({
+          id: body.agentId,
+          name: body.name,
+          type: 'openclaw' as const,
+          hifiUserId: agent.hifiUserId || '',
+          wallets: [],
+          accounts: [],
+          verified: agent.verified || false,
+          createdAt: new Date().toISOString(),
+          metadata: {},
+        });
+      } catch (error: any) {
+        request.log.error(error, 'Failed to register agent');
+        return reply.code(400).send({
+          success: false,
+          error: error.message,
+        });
+      }
     }
-  });
+  );
 
   /**
    * GET /transactions
    * List transactions (stub for now)
    */
-  app.get('/transactions', async (request, reply) => {
+  app.get('/transactions', { preHandler: optionalAuth }, async (request, reply) => {
+    // Stub: Return empty array for now
+    // TODO: Implement transaction history storage
     return reply.send([]);
+  });
+
+  /**
+   * POST /transactions
+   * Create a transaction (stub for now)
+   */
+  app.post('/transactions', { preHandler: optionalAuth }, async (request, reply) => {
+    // Stub: Return mock transaction
+    // TODO: Integrate with actual payment SDK
+    const body = request.body as any;
+    return reply.code(201).send({
+      id: `tx_${Date.now()}`,
+      fromAgent: body.fromAgent || '',
+      toAgent: body.toAgent || '',
+      amount: body.amount || 0,
+      currency: body.currency || 'USD',
+      status: 'pending' as const,
+      memo: body.memo,
+      createdAt: new Date().toISOString(),
+    });
+  });
+
+  /**
+   * GET /agents/:id/balances
+   * Get balances for an agent
+   */
+  app.get('/agents/:id/balances', { preHandler: optionalAuth }, async (request, reply) => {
+    // Stub: Return empty array for now
+    // TODO: Fetch real balances from HIFI SDK
+    const { id } = request.params as { id: string };
+    return reply.send([]);
+  });
+
+  /**
+   * POST /agents/:id/wallets
+   * Create a wallet for an agent
+   */
+  app.post('/agents/:id/wallets', { preHandler: optionalAuth }, async (request, reply) => {
+    // Stub: Return mock wallet
+    // TODO: Integrate with HIFI wallet creation
+    const { id } = request.params as { id: string };
+    const body = request.body as any;
+    return reply.code(201).send({
+      id: `wallet_${Date.now()}`,
+      agentId: id,
+      address: `0x${Math.random().toString(16).substring(2, 42)}`,
+      chain: body.chain || 'ethereum',
+      balance: [],
+      hifiWalletId: '',
+    });
+  });
+
+  /**
+   * POST /agents/:id/accounts
+   * Create a virtual account for an agent
+   */
+  app.post('/agents/:id/accounts', { preHandler: optionalAuth }, async (request, reply) => {
+    // Stub: Return mock virtual account
+    // TODO: Integrate with HIFI virtual account creation
+    const { id } = request.params as { id: string };
+    const body = request.body as any;
+    return reply.code(201).send({
+      id: `vacct_${Date.now()}`,
+      agentId: id,
+      currency: body.currency || 'USD',
+      balance: 0,
+      accountNumber: '1234567890',
+      routingNumber: '021000021',
+    });
   });
 
   // ==================== Agent Identity ====================
@@ -123,111 +310,168 @@ export async function registerRoutes(app: FastifyInstance, sdk: AgentFinanceSDK)
   /**
    * POST /api/agents/register
    * Register a new agent in the financial system
+   * Requires API key authentication
    */
-  app.post('/api/agents/register', async (request: FastifyRequest, reply: FastifyReply) => {
-    try {
-      const body = RegisterAgentSchema.parse(request.body);
-      const agent = await sdk.registerAgent(body);
-      
-      return reply.code(201).send({
-        success: true,
-        data: agent,
-      });
-    } catch (error: any) {
-      return reply.code(400).send({
-        success: false,
-        error: error.message,
-      });
+  app.post(
+    '/api/agents/register',
+    { preHandler: requireAuth },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        if (!request.user) {
+          return reply.code(401).send({
+            success: false,
+            error: 'Not authenticated',
+          });
+        }
+
+        const body = RegisterAgentSchema.parse(request.body);
+        
+        // Register agent with HIFI
+        const agent = await sdk.registerAgent(body);
+        
+        // Store agent-user relationship
+        await userStorage.registerAgent(body.agentId, request.user.userId, body.name);
+        
+        return reply.code(201).send({
+          success: true,
+          data: agent,
+        });
+      } catch (error: any) {
+        request.log.error(error, 'Failed to register agent');
+        return reply.code(400).send({
+          success: false,
+          error: error.message,
+        });
+      }
     }
-  });
+  );
 
   /**
    * GET /api/agents/:agentId
    * Get agent account information
+   * Requires API key authentication and ownership
    */
-  app.get('/api/agents/:agentId', async (request: FastifyRequest, reply: FastifyReply) => {
-    try {
-      const { agentId } = request.params as { agentId: string };
-      const agent = await sdk.getAgent(agentId);
-      
-      return reply.send({
-        success: true,
-        data: agent,
-      });
-    } catch (error: any) {
-      return reply.code(404).send({
-        success: false,
-        error: error.message,
-      });
+  app.get(
+    '/api/agents/:agentId',
+    { preHandler: requireAuth },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const { agentId } = request.params as { agentId: string };
+        
+        // Check ownership
+        if (!(await checkAgentOwnership(request, reply, agentId))) return;
+
+        const agent = await sdk.getAgent(agentId);
+        
+        return reply.send({
+          success: true,
+          data: agent,
+        });
+      } catch (error: any) {
+        request.log.error(error, 'Failed to get agent');
+        return reply.code(404).send({
+          success: false,
+          error: error.message,
+        });
+      }
     }
-  });
+  );
 
   /**
    * POST /api/agents/:agentId/verify
    * Initiate KYC verification
+   * Requires API key authentication and ownership
    */
-  app.post('/api/agents/:agentId/verify', async (request: FastifyRequest, reply: FastifyReply) => {
-    try {
-      const { agentId } = request.params as { agentId: string };
-      const { redirectUrl } = request.body as { redirectUrl?: string };
-      
-      const kycUrl = await sdk.verifyAgent(agentId, redirectUrl);
-      
-      return reply.send({
-        success: true,
-        data: { kycUrl },
-      });
-    } catch (error: any) {
-      return reply.code(400).send({
-        success: false,
-        error: error.message,
-      });
+  app.post(
+    '/api/agents/:agentId/verify',
+    { preHandler: requireAuth },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const { agentId } = request.params as { agentId: string };
+        
+        // Check ownership
+        if (!(await checkAgentOwnership(request, reply, agentId))) return;
+
+        const { redirectUrl } = request.body as { redirectUrl?: string };
+        const kycUrl = await sdk.verifyAgent(agentId, redirectUrl);
+        
+        return reply.send({
+          success: true,
+          data: { kycUrl },
+        });
+      } catch (error: any) {
+        request.log.error(error, 'Failed to initiate verification');
+        return reply.code(400).send({
+          success: false,
+          error: error.message,
+        });
+      }
     }
-  });
+  );
 
   /**
    * GET /api/agents/:agentId/verification-status
    * Check verification status
+   * Requires API key authentication and ownership
    */
-  app.get('/api/agents/:agentId/verification-status', async (request: FastifyRequest, reply: FastifyReply) => {
-    try {
-      const { agentId } = request.params as { agentId: string };
-      const status = await sdk.getVerificationStatus(agentId);
-      
-      return reply.send({
-        success: true,
-        data: status,
-      });
-    } catch (error: any) {
-      return reply.code(400).send({
-        success: false,
-        error: error.message,
-      });
+  app.get(
+    '/api/agents/:agentId/verification-status',
+    { preHandler: requireAuth },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const { agentId } = request.params as { agentId: string };
+        
+        // Check ownership
+        if (!(await checkAgentOwnership(request, reply, agentId))) return;
+
+        const status = await sdk.getVerificationStatus(agentId);
+        
+        return reply.send({
+          success: true,
+          data: status,
+        });
+      } catch (error: any) {
+        request.log.error(error, 'Failed to get verification status');
+        return reply.code(400).send({
+          success: false,
+          error: error.message,
+        });
+      }
     }
-  });
+  );
 
   // ==================== Wallets & Accounts ====================
 
   /**
    * GET /api/agents/:agentId/wallets
    * Get agent's wallet addresses
+   * Requires API key authentication and ownership
    */
-  app.get('/api/agents/:agentId/wallets', async (request: FastifyRequest, reply: FastifyReply) => {
-    try {
-      const { agentId } = request.params as { agentId: string };
-      const wallets = await sdk.getWallets(agentId);
-      
-      return reply.send({
-        success: true,
-        data: wallets,
-      });
-    } catch (error: any) {
-      return reply.code(404).send({
-        success: false,
-        error: error.message,
-      });
+  app.get(
+    '/api/agents/:agentId/wallets',
+    { preHandler: requireAuth },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const { agentId } = request.params as { agentId: string };
+        
+        // Check ownership
+        if (!(await checkAgentOwnership(request, reply, agentId))) return;
+
+        const wallets = await sdk.getWallets(agentId);
+        
+        return reply.send({
+          success: true,
+          data: wallets,
+        });
+      } catch (error: any) {
+        request.log.error(error, 'Failed to get wallets');
+        return reply.code(404).send({
+          success: false,
+          error: error.message,
+        });
+      }
     }
-  });
+  );
 
   /**
    * POST /api/accounts/deposit
@@ -280,23 +524,33 @@ export async function registerRoutes(app: FastifyInstance, sdk: AgentFinanceSDK)
   /**
    * POST /api/payments/send
    * Send payment from one agent to another
+   * Requires API key authentication and ownership of sender agent
    */
-  app.post('/api/payments/send', async (request: FastifyRequest, reply: FastifyReply) => {
-    try {
-      const body = SendPaymentSchema.parse(request.body);
-      const payment = await sdk.sendPayment(body);
-      
-      return reply.code(201).send({
-        success: true,
-        data: payment,
-      });
-    } catch (error: any) {
-      return reply.code(400).send({
-        success: false,
-        error: error.message,
-      });
+  app.post(
+    '/api/payments/send',
+    { preHandler: requireAuth },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const body = SendPaymentSchema.parse(request.body);
+        
+        // Check ownership of sender agent
+        if (!(await checkAgentOwnership(request, reply, body.from))) return;
+
+        const payment = await sdk.sendPayment(body);
+        
+        return reply.code(201).send({
+          success: true,
+          data: payment,
+        });
+      } catch (error: any) {
+        request.log.error(error, 'Failed to send payment');
+        return reply.code(400).send({
+          success: false,
+          error: error.message,
+        });
+      }
     }
-  });
+  );
 
   /**
    * GET /api/payments/:paymentId
@@ -322,25 +576,34 @@ export async function registerRoutes(app: FastifyInstance, sdk: AgentFinanceSDK)
   /**
    * GET /api/agents/:agentId/payments
    * List payments for an agent
+   * Requires API key authentication and ownership
    */
-  app.get('/api/agents/:agentId/payments', async (request: FastifyRequest, reply: FastifyReply) => {
-    try {
-      const { agentId } = request.params as { agentId: string };
-      const { limit } = request.query as { limit?: string };
-      
-      const payments = await sdk.listPayments(agentId, limit ? parseInt(limit) : 20);
-      
-      return reply.send({
-        success: true,
-        data: payments,
-      });
-    } catch (error: any) {
-      return reply.code(400).send({
-        success: false,
-        error: error.message,
-      });
+  app.get(
+    '/api/agents/:agentId/payments',
+    { preHandler: requireAuth },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const { agentId } = request.params as { agentId: string };
+        
+        // Check ownership
+        if (!(await checkAgentOwnership(request, reply, agentId))) return;
+
+        const { limit } = request.query as { limit?: string };
+        const payments = await sdk.listPayments(agentId, limit ? parseInt(limit) : 20);
+        
+        return reply.send({
+          success: true,
+          data: payments,
+        });
+      } catch (error: any) {
+        request.log.error(error, 'Failed to list payments');
+        return reply.code(400).send({
+          success: false,
+          error: error.message,
+        });
+      }
     }
-  });
+  );
 
   // ==================== Fiat/Crypto Conversion ====================
 

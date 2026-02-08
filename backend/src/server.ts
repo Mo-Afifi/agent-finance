@@ -10,6 +10,7 @@ import dotenv from 'dotenv';
 import { AgentFinanceSDK } from './sdk/agent-finance';
 import { registerRoutes } from './api/routes';
 import { registerAdminRoutes } from './api/admin-routes';
+import { registerUserRoutes } from './api/user-routes';
 
 // Load environment variables
 dotenv.config({ path: '../../.env' });
@@ -60,9 +61,8 @@ async function start() {
   });
 
   // Register routes
+  await registerUserRoutes(app);
   await registerRoutes(app, sdk);
-  
-  // Register admin routes
   await registerAdminRoutes(app, sdk);
 
   // Error handler
