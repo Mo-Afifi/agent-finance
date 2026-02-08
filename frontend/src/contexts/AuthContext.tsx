@@ -11,7 +11,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (credential: string) => void;
+  login: (credential: string) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = (credential: string) => {
+  const login = async (credential: string) => {
     try {
       // Decode JWT token to get user info
       const base64Url = credential.split('.')[1];
@@ -61,6 +61,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setUser(userData);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
+
+      // Register user with backend to get API key
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        const response = await fetch(`${apiUrl}/api/users/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: userData.email,
+            name: userData.name,
+            googleId: userData.sub,
+          }),
+        });
+        
+        const result = await response.json();
+        if (result.success && result.data?.apiKey) {
+          // Store API key
+          localStorage.setItem('apiToken', result.data.apiKey);
+          console.log('API key registered:', result.data.apiKey.substring(0, 15) + '...');
+        }
+      } catch (error) {
+        console.error('Failed to register with backend:', error);
+      }
     } catch (error) {
       console.error('Failed to decode credential:', error);
     }
