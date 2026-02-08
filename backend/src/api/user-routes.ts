@@ -13,6 +13,8 @@ import { requireAuth } from '../auth/middleware';
 
 const RegisterUserSchema = z.object({
   email: z.string().email(),
+  name: z.string().optional(),
+  googleId: z.string().optional(),
 });
 
 // ==================== Route Handlers ====================
