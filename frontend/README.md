@@ -1,73 +1,267 @@
-# React + TypeScript + Vite
+# Agent Finance Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Modern, responsive web interface for the Agent Finance infrastructure layer.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Landing Page
+- **Marketing Overview**: Clear explanation of what Agent Finance does
+- **Use Cases**: Real-world examples of agent-to-agent payments
+- **Getting Started**: Code examples and API documentation links
+- **Call-to-Action**: Direct access to dashboard
 
-## React Compiler
+### Dashboard
+- **Agent Management**: View and register AI agents
+- **Balance Monitoring**: Track virtual accounts and wallet balances
+- **Transaction History**: Complete audit trail of agent-to-agent transfers
+- **Real-time Activity**: Live feed of all financial events
+- **Statistics**: Key metrics and trends
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+- **React 19** - UI framework
+- **TypeScript** - Type safety
+- **Vite** - Fast development and build tool
+- **Tailwind CSS** - Utility-first styling
+- **React Router** - Client-side routing
+- **Axios** - API client
+- **Recharts** - Data visualization
+- **Lucide React** - Icon library
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Setup
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Prerequisites
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- Node.js 18+ and npm
+- Backend API running (see parent README)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Installation
+
+```bash
+# Install dependencies
+npm install
+
+# Copy environment template
+cp .env.example .env
+
+# Update .env with your backend API URL (default: http://localhost:3000)
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# Start dev server with hot reload
+npm run dev
 ```
+
+The app will be available at `http://localhost:5173`
+
+### Build
+
+```bash
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+## Environment Variables
+
+Create a `.env` file with:
+
+```env
+VITE_API_URL=http://localhost:3000
+```
+
+- **VITE_API_URL**: Backend API endpoint (default: http://localhost:3000)
+
+## Project Structure
+
+```
+frontend/
+├── src/
+│   ├── api/
+│   │   └── client.ts          # API client and type definitions
+│   ├── components/
+│   │   ├── AgentsList.tsx     # Agent management component
+│   │   ├── TransactionHistory.tsx
+│   │   ├── ActivityFeed.tsx   # Real-time activity stream
+│   │   ├── CreateAgentModal.tsx
+│   │   └── StatsCard.tsx      # Reusable stats display
+│   ├── pages/
+│   │   ├── LandingPage.tsx    # Marketing page
+│   │   └── Dashboard.tsx      # Main dashboard
+│   ├── App.tsx                # Router configuration
+│   ├── main.tsx               # Entry point
+│   └── index.css              # Global styles + Tailwind
+├── public/
+├── .env                       # Environment variables (gitignored)
+├── .env.example               # Environment template
+├── package.json
+├── tailwind.config.js
+├── tsconfig.json
+└── vite.config.ts
+```
+
+## API Integration
+
+The frontend expects the following API endpoints:
+
+### Agents
+- `GET /agents` - List all agents
+- `GET /agents/:id` - Get agent details
+- `POST /agents` - Register new agent
+- `GET /agents/:id/balances` - Get agent balances
+
+### Transactions
+- `GET /transactions` - List transactions (with filters)
+- `POST /transactions` - Create transaction
+
+### Activity
+- `GET /activity` - Get activity feed
+
+### Wallets & Accounts
+- `POST /agents/:id/wallets` - Create wallet
+- `POST /agents/:id/accounts` - Create virtual account
+
+See `src/api/client.ts` for full type definitions.
+
+## Features in Detail
+
+### Landing Page
+- Clean, modern design with gradient backgrounds
+- Responsive layout for all screen sizes
+- Interactive sections explaining agent finance concepts
+- Code examples showing API usage
+- Direct navigation to dashboard
+
+### Dashboard Components
+
+#### Stats Overview
+- Total balance across all agents
+- Active agent count
+- Transaction volume
+- Real-time trends
+
+#### Agents List
+- View all registered agents
+- Expandable details showing wallets and accounts
+- Balance breakdown by currency
+- Verification status indicators
+
+#### Transaction History
+- Chronological list of all transfers
+- Status indicators (pending, completed, failed)
+- Search and filter capabilities
+- Agent-to-agent flow visualization
+
+#### Activity Feed
+- Real-time updates
+- Event categorization
+- Timestamp formatting
+- Sticky sidebar for easy monitoring
+
+### Creating Agents
+- Modal form for registration
+- Validation and error handling
+- Support for OpenClaw and custom agents
+- Email integration for notifications
+
+## Styling
+
+Uses Tailwind CSS with custom theme:
+
+- **Primary Color**: Blue (financial trust)
+- **Dark Mode**: Slate backgrounds
+- **Accent Colors**: Green (positive), Red (negative), Yellow (pending)
+- **Typography**: System fonts for performance
+
+## Development Tips
+
+### Hot Reload
+Vite provides instant hot module replacement. Changes appear immediately.
+
+### TypeScript
+All components are fully typed. The API client exports interfaces for:
+- `Agent`
+- `Transaction`
+- `Activity`
+- `Wallet`
+- `VirtualAccount`
+- `Balance`
+
+### Mock Data
+To develop without a backend, modify `src/api/client.ts` to return mock data:
+
+```typescript
+export const agentFinanceAPI = {
+  getAgents: async (): Promise<Agent[]> => {
+    return [
+      {
+        id: 'agent-shade',
+        name: 'Shade',
+        type: 'openclaw',
+        hifiUserId: 'user123',
+        wallets: [],
+        accounts: [{ id: '1', agentId: 'agent-shade', currency: 'USD', balance: 100 }],
+        verified: true,
+        createdAt: new Date().toISOString(),
+        metadata: {},
+      },
+    ];
+  },
+  // ... other methods
+};
+```
+
+### Icons
+Lucide React provides high-quality icons. Import as needed:
+
+```typescript
+import { Icon1, Icon2 } from 'lucide-react';
+```
+
+## Deployment
+
+### Vercel (Recommended)
+
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel
+```
+
+### Other Platforms
+
+Build the static files and serve:
+
+```bash
+npm run build
+# Deploy the 'dist' folder
+```
+
+## Browser Support
+
+- Chrome/Edge (latest)
+- Firefox (latest)
+- Safari 14+
+- Mobile browsers
+
+## Contributing
+
+1. Follow the existing code style
+2. Use TypeScript types
+3. Keep components focused and reusable
+4. Test on multiple screen sizes
+5. Commit with clear messages
+
+## License
+
+See parent project LICENSE.
+
+---
+
+**Built for the autonomous agent economy 🤖💰**
