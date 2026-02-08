@@ -1,0 +1,599 @@
+openapi: 3.0.3
+info:
+  title: Agent Finance API
+  version: 0.1.0
+  description: |
+    Financial infrastructure for AI agent-to-agent payments.
+    
+    This API enables autonomous AI agents to:
+    - Register financial identities
+    - Send and receive payments
+    - Convert between fiat and crypto
+    - Manage wallets and bank accounts
+    
+    Built on HIFI Bridge infrastructure.
+  contact:
+    name: Agent Finance Team
+    email: [email protected]
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+  - url: https://api.agentfinance.io
+    description: Production server
+
+tags:
+  - name: Health
+    description: Service health checks
+  - name: Agents
+    description: Agent identity management
+  - name: Wallets
+    description: Wallet and account operations
+  - name: Payments
+    description: Agent-to-agent payments
+  - name: Conversion
+    description: Fiat/crypto conversion
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      description: Check if the API is running and healthy
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [healthy, unhealthy]
+                  timestamp:
+                    type: string
+                    format: date-time
+                  service:
+                    type: string
+
+  /api/agents/register:
+    post:
+      tags: [Agents]
+      summary: Register new agent
+      description: Create a new agent identity in the financial system
+      operationId: registerAgent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agentId, name, email]
+              properties:
+                agentId:
+                  type: string
+                  description: Unique identifier for the agent
+                  example: my-agent-123
+                name:
+                  type: string
+                  description: Agent display name
+                  example: My AI Agent
+                email:
+                  type: string
+                  format: email
+                  description: Contact email for the agent
+                  example: [email protected]
+                type:
+                  type: string
+                  enum: [individual, business]
+                  default: individual
+                  description: Agent type
+      responses:
+        '201':
+          description: Agent registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /api/agents/{agentId}:
+    get:
+      tags: [Agents]
+      summary: Get agent details
+      description: Retrieve agent account information
+      operationId: getAgent
+      parameters:
+        - $ref: '#/components/parameters/AgentId'
+      responses:
+        '200':
+          description: Agent found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/agents/{agentId}/verify:
+    post:
+      tags: [Agents]
+      summary: Initiate KYC verification
+      description: Generate KYC link for agent verification
+      operationId: verifyAgent
+      parameters:
+        - $ref: '#/components/parameters/AgentId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                redirectUrl:
+                  type: string
+                  format: uri
+                  description: URL to redirect after KYC completion
+      responses:
+        '200':
+          description: KYC link generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      kycUrl:
+                        type: string
+                        format: uri
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /api/agents/{agentId}/verification-status:
+    get:
+      tags: [Agents]
+      summary: Check verification status
+      description: Get current KYC verification status for agent
+      operationId: getVerificationStatus
+      parameters:
+        - $ref: '#/components/parameters/AgentId'
+      responses:
+        '200':
+          description: Verification status retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      verified:
+                        type: boolean
+                      status:
+                        type: string
+                      message:
+                        type: string
+
+  /api/agents/{agentId}/wallets:
+    get:
+      tags: [Wallets]
+      summary: Get agent wallets
+      description: Retrieve wallet addresses for all chains
+      operationId: getWallets
+      parameters:
+        - $ref: '#/components/parameters/AgentId'
+      responses:
+        '200':
+          description: Wallet addresses retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    additionalProperties:
+                      type: string
+                    example:
+                      POLYGON: "0x1234567890abcdef..."
+                      ETHEREUM: "0x1234567890abcdef..."
+
+  /api/accounts/deposit:
+    post:
+      tags: [Wallets]
+      summary: Create deposit account
+      description: Create virtual account for fiat deposits (onramp)
+      operationId: createDepositAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agentId]
+              properties:
+                agentId:
+                  type: string
+                fiatCurrency:
+                  type: string
+                  default: usd
+                cryptoCurrency:
+                  type: string
+                  default: usdc
+                chain:
+                  $ref: '#/components/schemas/Chain'
+      responses:
+        '201':
+          description: Deposit account created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/VirtualAccount'
+
+  /api/accounts/bank:
+    post:
+      tags: [Wallets]
+      summary: Register bank account
+      description: Register bank account for withdrawals (offramp)
+      operationId: registerBankAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agentId, accountType, accountNumber, routingNumber, bankName, accountHolderName]
+              properties:
+                agentId:
+                  type: string
+                accountType:
+                  type: string
+                  enum: [checking, savings]
+                accountNumber:
+                  type: string
+                routingNumber:
+                  type: string
+                bankName:
+                  type: string
+                accountHolderName:
+                  type: string
+      responses:
+        '201':
+          description: Bank account registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      status:
+                        type: string
+
+  /api/payments/send:
+    post:
+      tags: [Payments]
+      summary: Send payment
+      description: Send payment from one agent to another
+      operationId: sendPayment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [from, to, amount, currency]
+              properties:
+                from:
+                  type: string
+                  description: Sender agent ID
+                to:
+                  type: string
+                  description: Recipient agent ID
+                amount:
+                  type: number
+                  minimum: 0
+                  description: Amount to send
+                currency:
+                  type: string
+                  description: Currency code
+                  example: USDC
+                chain:
+                  $ref: '#/components/schemas/Chain'
+                memo:
+                  type: string
+                  description: Payment memo/note
+      responses:
+        '201':
+          description: Payment initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Transfer'
+
+  /api/payments/{paymentId}:
+    get:
+      tags: [Payments]
+      summary: Get payment status
+      description: Retrieve payment details and status
+      operationId: getPaymentStatus
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Payment found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Transfer'
+
+  /api/agents/{agentId}/payments:
+    get:
+      tags: [Payments]
+      summary: List agent payments
+      description: Get payment history for an agent
+      operationId: listPayments
+      parameters:
+        - $ref: '#/components/parameters/AgentId'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        '200':
+          description: Payments retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transfer'
+
+  /api/deposit/fiat:
+    post:
+      tags: [Conversion]
+      summary: Deposit fiat
+      description: Convert fiat to crypto (onramp)
+      operationId: depositFiat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agentId, amount]
+              properties:
+                agentId:
+                  type: string
+                amount:
+                  type: number
+                  minimum: 0
+                fiatCurrency:
+                  type: string
+                  default: usd
+                cryptoCurrency:
+                  type: string
+                  default: usdc
+                chain:
+                  $ref: '#/components/schemas/Chain'
+      responses:
+        '201':
+          description: Onramp initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+
+  /api/withdraw/fiat:
+    post:
+      tags: [Conversion]
+      summary: Withdraw to fiat
+      description: Convert crypto to fiat (offramp)
+      operationId: withdrawToFiat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agentId, amount, bankAccountId]
+              properties:
+                agentId:
+                  type: string
+                amount:
+                  type: number
+                  minimum: 0
+                bankAccountId:
+                  type: string
+                cryptoCurrency:
+                  type: string
+                  default: usdc
+                fiatCurrency:
+                  type: string
+                  default: usd
+                chain:
+                  $ref: '#/components/schemas/Chain'
+      responses:
+        '201':
+          description: Offramp initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+
+components:
+  parameters:
+    AgentId:
+      name: agentId
+      in: path
+      required: true
+      description: Unique agent identifier
+      schema:
+        type: string
+
+  schemas:
+    Chain:
+      type: string
+      enum: [ETHEREUM, POLYGON, BASE]
+      default: POLYGON
+
+    AgentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            agentId:
+              type: string
+            hifiUserId:
+              type: string
+            name:
+              type: string
+            email:
+              type: string
+            wallets:
+              type: object
+              additionalProperties:
+                type: string
+            verified:
+              type: boolean
+            createdAt:
+              type: string
+              format: date-time
+
+    Transfer:
+      type: object
+      properties:
+        transferType:
+          type: string
+          enum: [WALLET.TRANSFER]
+        transferDetails:
+          type: object
+          properties:
+            id:
+              type: string
+            requestId:
+              type: string
+            createdAt:
+              type: string
+              format: date-time
+            status:
+              type: string
+              enum: [CREATED, PENDING, COMPLETE, FAILED]
+            chain:
+              $ref: '#/components/schemas/Chain'
+            currency:
+              type: string
+            amount:
+              type: number
+
+    VirtualAccount:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        source:
+          type: object
+          properties:
+            paymentRail:
+              type: array
+              items:
+                type: string
+            currency:
+              type: string
+        destination:
+          type: object
+          properties:
+            chain:
+              $ref: '#/components/schemas/Chain'
+            currency:
+              type: string
+            walletAddress:
+              type: string
+        status:
+          type: string
+        depositInstructions:
+          type: object
+
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              error:
+                type: string
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              error:
+                type: string
