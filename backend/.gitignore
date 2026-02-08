@@ -34,4 +34,5 @@ coverage/
 # Logs
 logs/
 *.log
-data/
+data/*.json
+!data/.gitkeep
