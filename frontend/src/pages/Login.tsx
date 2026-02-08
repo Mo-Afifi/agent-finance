@@ -1,12 +1,14 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
-import { Coins, Shield, Zap, Lock } from 'lucide-react';
+import { Coins, Shield, Zap, Lock, AlertCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Login() {
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -14,15 +16,29 @@ export default function Login() {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleSuccess = (credentialResponse: CredentialResponse) => {
+  const handleSuccess = async (credentialResponse: CredentialResponse) => {
     if (credentialResponse.credential) {
-      login(credentialResponse.credential);
-      navigate('/dashboard');
+      setError(null);
+      setIsLoggingIn(true);
+      
+      try {
+        console.log('🚀 Processing Google login...');
+        await login(credentialResponse.credential);
+        console.log('✅ Login successful, redirecting to dashboard...');
+        navigate('/dashboard');
+      } catch (err) {
+        console.error('❌ Login error:', err);
+        const errorMessage = err instanceof Error ? err.message : 'Login failed. Please try again.';
+        setError(errorMessage);
+        setIsLoggingIn(false);
+      }
     }
   };
 
   const handleError = () => {
-    console.error('Login Failed');
+    console.error('❌ Google OAuth Login Failed');
+    setError('Google authentication failed. Please try again.');
+    setIsLoggingIn(false);
   };
 
   return (
@@ -48,17 +64,35 @@ export default function Login() {
             Sign in to manage your AI agents and finances
           </p>
 
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-900/20 border border-red-500/50 rounded-lg flex items-start space-x-3">
+              <AlertCircle className="h-5 w-5 text-red-400 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-red-300 text-sm font-medium">Login Error</p>
+                <p className="text-red-200 text-xs mt-1">{error}</p>
+              </div>
+            </div>
+          )}
+
           {/* Google Login Button */}
           <div className="flex justify-center mb-8">
-            <GoogleLogin
-              onSuccess={handleSuccess}
-              onError={handleError}
-              theme="filled_blue"
-              size="large"
-              text="signin_with"
-              shape="rectangular"
-              logo_alignment="left"
-            />
+            {isLoggingIn ? (
+              <div className="flex items-center space-x-3 text-text-secondary">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-lemon"></div>
+                <span>Logging in...</span>
+              </div>
+            ) : (
+              <GoogleLogin
+                onSuccess={handleSuccess}
+                onError={handleError}
+                theme="filled_blue"
+                size="large"
+                text="signin_with"
+                shape="rectangular"
+                logo_alignment="left"
+              />
+            )}
           </div>
 
           {/* Features */}

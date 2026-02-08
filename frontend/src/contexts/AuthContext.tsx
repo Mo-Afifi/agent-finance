@@ -40,6 +40,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (credential: string) => {
     try {
+      console.log('🔐 Starting Google OAuth login process...');
+      
       // Decode JWT token to get user info
       const base64Url = credential.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -51,41 +53,115 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       );
       
       const payload = JSON.parse(jsonPayload);
+      console.log('✅ Decoded Google credential payload:', {
+        email: payload.email,
+        name: payload.name,
+        sub: payload.sub,
+        email_verified: payload.email_verified,
+      });
+      
+      // Validate email exists and is valid
+      if (!payload.email || typeof payload.email !== 'string') {
+        throw new Error('Invalid email in Google credential payload');
+      }
+      
+      // Basic email format validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(payload.email)) {
+        throw new Error(`Invalid email format: ${payload.email}`);
+      }
       
       const userData: User = {
         email: payload.email,
-        name: payload.name,
+        name: payload.name || payload.email.split('@')[0], // Fallback to email username if no name
         picture: payload.picture,
         sub: payload.sub,
       };
 
-      setUser(userData);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
+      console.log('👤 User data extracted:', {
+        email: userData.email,
+        name: userData.name,
+        hasGoogleId: !!userData.sub,
+      });
 
-      // Register user with backend to get API key
-      try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        const response = await fetch(`${apiUrl}/api/users/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+      // Register user with backend to get API key BEFORE setting local state
+      let apiKey: string | null = null;
+      let retryCount = 0;
+      const maxRetries = 3;
+      
+      while (retryCount < maxRetries && !apiKey) {
+        try {
+          const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+          console.log(`📡 Registering user with backend (attempt ${retryCount + 1}/${maxRetries}):`, apiUrl);
+          
+          const requestBody = {
             email: userData.email,
             name: userData.name,
             googleId: userData.sub,
-          }),
-        });
-        
-        const result = await response.json();
-        if (result.success && result.data?.apiKey) {
-          // Store API key
-          localStorage.setItem('apiToken', result.data.apiKey);
-          console.log('API key registered:', result.data.apiKey.substring(0, 15) + '...');
+          };
+          
+          console.log('📤 Request body:', requestBody);
+          
+          const response = await fetch(`${apiUrl}/api/users/register`, {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
+          });
+          
+          console.log(`📥 Backend response status: ${response.status} ${response.statusText}`);
+          
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ Backend returned error:', errorText);
+            throw new Error(`Backend registration failed: ${response.status} - ${errorText}`);
+          }
+          
+          const result = await response.json();
+          console.log('✅ Backend response:', {
+            success: result.success,
+            hasApiKey: !!result.data?.apiKey,
+            userId: result.data?.userId,
+          });
+          
+          if (result.success && result.data?.apiKey) {
+            apiKey = result.data.apiKey;
+            localStorage.setItem('apiToken', apiKey);
+            console.log('🔑 API key stored successfully:', apiKey.substring(0, 20) + '...');
+          } else {
+            throw new Error('Backend response missing API key');
+          }
+        } catch (error) {
+          retryCount++;
+          console.error(`❌ Failed to register with backend (attempt ${retryCount}/${maxRetries}):`, error);
+          
+          if (retryCount < maxRetries) {
+            console.log(`⏳ Retrying in ${retryCount} second(s)...`);
+            await new Promise(resolve => setTimeout(resolve, retryCount * 1000));
+          } else {
+            console.error('❌ Max retries reached. Registration failed.');
+            throw new Error(`Failed to register after ${maxRetries} attempts: ${error instanceof Error ? error.message : String(error)}`);
+          }
         }
-      } catch (error) {
-        console.error('Failed to register with backend:', error);
+      }
+      
+      // Only set user state and localStorage after successful backend registration
+      if (apiKey) {
+        setUser(userData);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
+        console.log('✅ Login complete! User authenticated and API key stored.');
+      } else {
+        throw new Error('Failed to obtain API key from backend');
       }
     } catch (error) {
-      console.error('Failed to decode credential:', error);
+      console.error('❌ Login failed:', error);
+      // Clear any partial state
+      setUser(null);
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem('apiToken');
+      throw error; // Re-throw so calling code can handle it
     }
   };
 
