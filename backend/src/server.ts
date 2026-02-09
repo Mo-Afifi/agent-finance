@@ -36,8 +36,13 @@ async function start() {
   });
 
   // Register plugins
+  // Parse CORS_ORIGIN (can be comma-separated list)
+  const corsOrigin = process.env.CORS_ORIGIN 
+    ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
+    : '*';
+  
   await app.register(cors, {
-    origin: process.env.CORS_ORIGIN || '*',
+    origin: corsOrigin,
   });
 
   await app.register(helmet, {
