@@ -388,6 +388,44 @@ export async function registerRoutes(app: FastifyInstance, sdk: AgentFinanceSDK)
   );
 
   /**
+   * POST /v1/agents/register
+   * Alias for /api/agents/register (landing page compatibility)
+   */
+  app.post(
+    '/v1/agents/register',
+    { preHandler: requireAuth },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        if (!request.user) {
+          return reply.code(401).send({
+            success: false,
+            error: 'Not authenticated',
+          });
+        }
+
+        const body = RegisterAgentSchema.parse(request.body);
+        
+        // Register agent with HIFI
+        const agent = await sdk.registerAgent(body);
+        
+        // Store agent-user relationship
+        await userStorage.registerAgent(body.agentId, request.user.userId, body.name);
+        
+        return reply.code(201).send({
+          success: true,
+          data: agent,
+        });
+      } catch (error: any) {
+        request.log.error(error, 'Failed to register agent');
+        return reply.code(400).send({
+          success: false,
+          error: error.message,
+        });
+      }
+    }
+  );
+
+  /**
    * GET /api/agents/:agentId
    * Get agent account information
    * Requires API key authentication and ownership
