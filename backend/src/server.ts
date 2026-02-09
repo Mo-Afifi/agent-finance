@@ -36,13 +36,15 @@ async function start() {
   });
 
   // Register plugins
-  // Parse CORS_ORIGIN (can be comma-separated list)
-  const corsOrigin = process.env.CORS_ORIGIN 
-    ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
-    : '*';
+  // Parse CORS_ORIGIN (can be comma-separated list or wildcard)
+  const corsOriginEnv = process.env.CORS_ORIGIN || '*';
+  const corsOrigin = corsOriginEnv === '*' 
+    ? '*' 
+    : corsOriginEnv.split(',').map(o => o.trim());
   
   await app.register(cors, {
     origin: corsOrigin,
+    credentials: true,
   });
 
   await app.register(helmet, {

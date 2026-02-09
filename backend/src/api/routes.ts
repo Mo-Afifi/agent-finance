@@ -13,7 +13,7 @@ import { userStorage } from '../auth/storage';
 const RegisterAgentSchema = z.object({
   agentId: z.string().min(1),
   name: z.string().min(1),
-  email: z.string().email().optional(),
+  email: z.string().email().optional().or(z.literal('')).transform(val => val === '' ? undefined : val),
   type: z.enum(['openclaw', 'custom', 'individual', 'business']).default('openclaw'),
   metadata: z.record(z.any()).optional(),
 });
