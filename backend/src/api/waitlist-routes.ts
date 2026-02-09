@@ -6,7 +6,7 @@
 
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
-import { waitlistStorage } from './waitlist-storage';
+import { waitlistStorage } from './waitlist-storage-factory';
 import { requireAuth } from '../auth/middleware';
 
 // ==================== Request Schemas ====================

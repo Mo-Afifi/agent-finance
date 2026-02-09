@@ -5,7 +5,7 @@
 
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { AgentFinanceSDK } from '../sdk/agent-finance';
-import { userStorage } from '../auth/storage';
+import { userStorage } from '../auth/storage-factory';
 
 // Mock data storage (replace with actual database in production)
 let mockUsers: any[] = [];

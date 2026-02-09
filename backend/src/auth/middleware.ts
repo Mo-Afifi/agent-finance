@@ -5,7 +5,7 @@
  */
 
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { userStorage } from './storage';
+import { userStorage } from './storage-factory';
 
 // Extend Fastify request with user info
 declare module 'fastify' {

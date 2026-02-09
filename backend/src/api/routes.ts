@@ -6,7 +6,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import { AgentFinanceSDK } from '../sdk/agent-finance';
 import { requireAuth, optionalAuth } from '../auth/middleware';
-import { userStorage } from '../auth/storage';
+import { userStorage } from '../auth/storage-factory';
 
 // ==================== Request Schemas ====================
 
