@@ -21,12 +21,8 @@ const RegisterUserSchema = z.object({
 
 export async function registerUserRoutes(app: FastifyInstance) {
   
-  /**
-   * POST /api/users/register
-   * Register or get existing user by email (called after Google OAuth)
-   * Returns userId, apiKey, email
-   */
-  app.post('/api/users/register', async (request: FastifyRequest, reply: FastifyReply) => {
+  // Registration handler (shared by both routes)
+  const registerHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const body = RegisterUserSchema.parse(request.body);
       
@@ -50,7 +46,20 @@ export async function registerUserRoutes(app: FastifyInstance) {
         message: error.message,
       });
     }
-  });
+  };
+
+  /**
+   * POST /api/users/register
+   * Register or get existing user by email (called after Google OAuth)
+   * Returns userId, apiKey, email
+   */
+  app.post('/api/users/register', registerHandler);
+
+  /**
+   * POST /auth/register
+   * Alias for /api/users/register (frontend compatibility)
+   */
+  app.post('/auth/register', registerHandler);
 
   /**
    * GET /api/users/me
