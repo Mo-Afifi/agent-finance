@@ -136,7 +136,7 @@ export async function registerRoutes(app: FastifyInstance, sdk: AgentFinanceSDK)
         
         // Transform to match frontend Agent interface
         const agents = await Promise.all(
-          userAgents.map(async (ua) => {
+          userAgents.map(async (ua: any) => {
             try {
               // Try to get full agent details from SDK
               const agentDetails = await sdk.getAgent(ua.agentId);

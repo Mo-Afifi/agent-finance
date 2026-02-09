@@ -107,7 +107,7 @@ export async function registerWaitlistRoutes(app: FastifyInstance) {
         const entries = await waitlistStorage.getAll();
         
         // Sort by signup date (newest first)
-        entries.sort((a, b) => 
+        entries.sort((a: any, b: any) => 
           new Date(b.signupDate).getTime() - new Date(a.signupDate).getTime()
         );
         

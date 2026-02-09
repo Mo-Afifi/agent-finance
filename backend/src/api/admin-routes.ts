@@ -73,7 +73,7 @@ export async function registerAdminRoutes(app: FastifyInstance, sdk: AgentFinanc
       const allUsers = await userStorage.getAllUsers();
 
       // Transform to admin format
-      let users = await Promise.all(allUsers.map(async (user) => {
+      let users = await Promise.all(allUsers.map(async (user: any) => {
         const userAgents = await userStorage.getAgentsByUserId(user.userId);
         return {
           id: user.userId,
@@ -231,7 +231,7 @@ export async function registerAdminRoutes(app: FastifyInstance, sdk: AgentFinanc
       const allAgents = await userStorage.getAllAgents();
       
       // Transform to admin format
-      let agents = await Promise.all(allAgents.map(async (agent) => {
+      let agents = await Promise.all(allAgents.map(async (agent: any) => {
         const user = await userStorage.getUserById(agent.userId);
         return {
           id: agent.agentId,

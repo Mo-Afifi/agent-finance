@@ -16,4 +16,16 @@ export const waitlistStorage = {
   update: async (email: string, updates: any) => {
     return await (userStorage as any).updateWaitlistStatus(email, updates.status, updates.notes);
   },
+  delete: async (email: string) => {
+    // TODO: Implement if needed
+    throw new Error('Delete not implemented');
+  },
+  getStats: async () => {
+    const all = await (userStorage as any).getAllWaitlist();
+    return {
+      total: all.length,
+      pending: all.filter((e: any) => e.status === 'pending').length,
+      approved: all.filter((e: any) => e.status === 'approved').length,
+    };
+  },
 };
