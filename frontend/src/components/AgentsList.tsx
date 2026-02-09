@@ -1,6 +1,5 @@
 import { Agent } from '../api/client';
-import { CheckCircle, XCircle, Wallet, CreditCard, Trash2, Copy, Check } from 'lucide-react';
-import { useState } from 'react';
+import { CheckCircle, XCircle, Wallet, CreditCard, Trash2 } from 'lucide-react';
 
 interface AgentsListProps {
   agents: Agent[];
@@ -10,18 +9,6 @@ interface AgentsListProps {
 }
 
 export default function AgentsList({ agents, selectedAgent, onSelectAgent, onDeleteAgent }: AgentsListProps) {
-  const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
-
-  const copyToClipboard = async (address: string) => {
-    try {
-      await navigator.clipboard.writeText(address);
-      setCopiedAddress(address);
-      setTimeout(() => setCopiedAddress(null), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
-    }
-  };
-
   const getChainColor = (chain: string) => {
     switch (chain.toUpperCase()) {
       case 'ETHEREUM':
@@ -149,24 +136,8 @@ export default function AgentsList({ agents, selectedAgent, onSelectAgent, onDel
                                 )}
                               </div>
                             </div>
-                            <div className="flex items-center gap-2 group">
-                              <div className="text-xs text-text-muted font-mono flex-1 truncate">
-                                {wallet.address}
-                              </div>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  copyToClipboard(wallet.address);
-                                }}
-                                className="p-1.5 rounded hover:bg-lemon/10 transition-colors opacity-0 group-hover:opacity-100"
-                                title="Copy address"
-                              >
-                                {copiedAddress === wallet.address ? (
-                                  <Check className="h-3.5 w-3.5 text-success" />
-                                ) : (
-                                  <Copy className="h-3.5 w-3.5 text-text-tertiary hover:text-lemon" />
-                                )}
-                              </button>
+                            <div className="text-xs text-text-muted font-mono break-all">
+                              {wallet.address}
                             </div>
                           </div>
                         ))}
