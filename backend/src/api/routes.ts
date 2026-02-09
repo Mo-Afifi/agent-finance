@@ -140,12 +140,22 @@ export async function registerRoutes(app: FastifyInstance, sdk: AgentFinanceSDK)
             try {
               // Try to get full agent details from SDK
               const agentDetails = await sdk.getAgent(ua.agentId);
+              
+              // Transform wallets to frontend format
+              const wallets = agentDetails.wallets 
+                ? Object.entries(agentDetails.wallets).map(([chain, address]) => ({
+                    chain,
+                    address: address as string,
+                    balance: 0, // TODO: Fetch real balance from blockchain
+                  })) 
+                : [];
+              
               return {
                 id: ua.agentId,
                 name: ua.name,
                 type: 'openclaw' as const,
                 hifiUserId: agentDetails.hifiUserId || '',
-                wallets: [],
+                wallets, // Use the transformed wallets
                 accounts: [],
                 verified: agentDetails.verified || false,
                 createdAt: ua.createdAt,
