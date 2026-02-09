@@ -59,7 +59,7 @@ export class HifiClient {
    * Test API connectivity
    */
   async ping(): Promise<{ message: string }> {
-    const response = await this.client.get('/v2/ping');
+    const response = await this.client.get('/ping');
     return response.data;
   }
 
