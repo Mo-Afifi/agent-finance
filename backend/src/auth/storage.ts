@@ -246,6 +246,14 @@ class UserStorage {
     this.agents.delete(agentId);
     await this.persist();
   }
+
+  /**
+   * Get all users (admin only)
+   */
+  async getAllUsers(): Promise<User[]> {
+    await this.init();
+    return Array.from(this.users.values());
+  }
 }
 
 // Singleton instance

@@ -5,6 +5,7 @@
 
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { AgentFinanceSDK } from '../sdk/agent-finance';
+import { userStorage } from '../auth/storage';
 
 // Mock data storage (replace with actual database in production)
 let mockUsers: any[] = [];
@@ -65,42 +66,24 @@ export async function registerAdminRoutes(app: FastifyInstance, sdk: AgentFinanc
     try {
       const { search, status, limit } = request.query as any;
       
-      // Mock user data (replace with database query)
-      let users = mockUsers.length > 0 ? mockUsers : [
-        {
-          id: 'user_1',
-          email: 'mo@openclaw.com',
-          name: 'Mo Hassan',
-          createdAt: '2026-01-15T10:00:00Z',
-          status: 'active',
-          kycStatus: 'verified',
-          agentCount: 3,
-          totalBalance: 45000,
-          lastActive: '2026-02-08T15:30:00Z',
-        },
-        {
-          id: 'user_2',
-          email: 'alice@example.com',
-          name: 'Alice Smith',
-          createdAt: '2026-02-01T14:20:00Z',
+      // Get real users from storage
+      const allUsers = await userStorage.getAllUsers();
+
+      // Transform to admin format
+      let users = await Promise.all(allUsers.map(async (user) => {
+        const userAgents = await userStorage.getAgentsByUserId(user.userId);
+        return {
+          id: user.userId,
+          email: user.email,
+          name: user.email.split('@')[0], // Extract name from email
+          createdAt: user.createdAt,
           status: 'active',
           kycStatus: 'pending',
-          agentCount: 1,
-          totalBalance: 12000,
-          lastActive: '2026-02-07T09:15:00Z',
-        },
-        {
-          id: 'user_3',
-          email: 'bob@example.com',
-          name: 'Bob Johnson',
-          createdAt: '2026-01-28T08:45:00Z',
-          status: 'suspended',
-          kycStatus: 'verified',
-          agentCount: 2,
-          totalBalance: 0,
-          lastActive: '2026-02-05T12:00:00Z',
-        },
-      ];
+          agentCount: userAgents.length,
+          totalBalance: 0, // TODO: Calculate from agent balances
+          lastActive: user.updatedAt || user.createdAt,
+        };
+      }));
 
       if (status && status !== 'all') {
         users = users.filter(u => u.status === status);
