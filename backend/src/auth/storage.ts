@@ -254,6 +254,14 @@ class UserStorage {
     await this.init();
     return Array.from(this.users.values());
   }
+
+  /**
+   * Get all agents (admin only)
+   */
+  async getAllAgents(): Promise<UserAgent[]> {
+    await this.init();
+    return Array.from(this.agents.values());
+  }
 }
 
 // Singleton instance

@@ -23,24 +23,27 @@ export async function registerAdminRoutes(app: FastifyInstance, sdk: AgentFinanc
    */
   app.get('/api/admin/stats', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      // In production, calculate from database
+      // Get real user and agent counts from storage
+      const allUsers = await userStorage.getAllUsers();
+      const allAgents = await userStorage.getAllAgents();
+      
       const stats = {
-        totalUsers: mockUsers.length || 0,
-        totalAgents: mockAgents.length || 0,
+        totalUsers: allUsers.length,
+        totalAgents: allAgents.length,
         totalVolume: {
-          allTime: 5420000,
-          last30d: 890000,
-          last7d: 245000,
-          last24h: 78000,
+          allTime: 0, // TODO: Calculate from transaction history
+          last30d: 0,
+          last7d: 0,
+          last24h: 0,
         },
-        tvl: 1250000,
+        tvl: 0, // TODO: Calculate from agent balances
         revenue: {
-          total: 27100,
-          last30d: 4450,
+          total: 0, // TODO: Calculate from transaction fees
+          last30d: 0,
         },
         activeUsers: {
-          dau: 42,
-          mau: 203,
+          dau: 0, // TODO: Track daily active users
+          mau: allUsers.length, // For now, assume all users are monthly active
         },
       };
 
@@ -224,45 +227,23 @@ export async function registerAdminRoutes(app: FastifyInstance, sdk: AgentFinanc
     try {
       const { search, verified, limit } = request.query as any;
       
-      // Mock agent data
-      let agents = mockAgents.length > 0 ? mockAgents : [
-        {
-          id: 'agent_1',
-          userId: 'user_1',
-          name: 'Trading Bot Alpha',
-          email: 'mo@openclaw.com',
-          type: 'business',
-          verified: true,
-          createdAt: '2026-01-20T10:00:00Z',
-          accounts: [
-            { id: 'acc_1', currency: 'USDC', balance: 25000, chain: 'ETHEREUM' },
-          ],
-        },
-        {
-          id: 'agent_2',
-          userId: 'user_1',
-          name: 'Payment Agent',
-          email: 'mo@openclaw.com',
-          type: 'individual',
-          verified: true,
-          createdAt: '2026-01-22T11:30:00Z',
-          accounts: [
-            { id: 'acc_2', currency: 'USDC', balance: 15000, chain: 'BASE' },
-          ],
-        },
-        {
-          id: 'agent_3',
-          userId: 'user_2',
-          name: 'Alice Helper',
-          email: 'alice@example.com',
-          type: 'individual',
-          verified: false,
-          createdAt: '2026-02-01T14:20:00Z',
-          accounts: [
-            { id: 'acc_3', currency: 'USDC', balance: 12000, chain: 'POLYGON' },
-          ],
-        },
-      ];
+      // Get real agents from storage
+      const allAgents = await userStorage.getAllAgents();
+      
+      // Transform to admin format
+      let agents = await Promise.all(allAgents.map(async (agent) => {
+        const user = await userStorage.getUserById(agent.userId);
+        return {
+          id: agent.agentId,
+          userId: agent.userId,
+          name: agent.name,
+          email: agent.ownerEmail,
+          type: 'individual', // TODO: Add agent type to storage
+          verified: true, // TODO: Add verification status to storage
+          createdAt: agent.createdAt,
+          accounts: [], // TODO: Fetch from HIFI or blockchain
+        };
+      }));
 
       if (verified !== undefined) {
         agents = agents.filter(a => a.verified === (verified === 'true'));
